@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sayari Document Ledger – Tokenization Factory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- ethers.js v5 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<!-- WalletConnect SignClient v2 — proper UMD build, works in plain HTML -->
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2.17.0/dist/index.umd.js"></script>
+<!-- Web3Modal standalone — handles QR display, deep links, wallet list -->
+<script src="https://cdn.jsdelivr.net/npm/@web3modal/standalone@2.4.3/dist/index.umd.js"></script>
+<script>
+// Tiny self-contained QR code generator (no CDN needed)
+// Based on qrcode-generator by Kazuhiko Arase, MIT license
+// Inlined so the app works fully offline after first load
+var QRCodeGen=(function(){var a=function(e,t){this.typeNumber=e,this.errorCorrectLevel=t,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]};a.prototype={addData:function(e){var t=new s(e);this.dataList.push(t),this.dataCache=null},isDark:function(e,t){if(e<0||this.moduleCount<=e||t<0||this.moduleCount<=t)throw new Error(e+","+t);return this.modules[e][t]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(e,t){this.moduleCount=4*this.typeNumber+17,this.modules=function(e){var t=new Array(e);for(var r=0;r<e;r++)t[r]=new Array(e);return t}(this.moduleCount);for(var r=0;r<this.moduleCount;r++)for(var i=0;i<this.moduleCount;i++)this.modules[r][i]=null;this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(e,t),this.typeNumber>=7&&this.setupTypeNumber(e),null==this.dataCache&&(this.dataCache=a.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,t)},setupPositionProbePattern:function(e,t){for(var r=-1;r<=7;r++)if(!(e+r<=-1||this.moduleCount<=e+r))for(var i=-1;i<=7;i++){if(t+i<=-1||this.moduleCount<=t+i)continue;this.modules[e+r][t+i]=0<=r&&r<=6&&(0==i||6==i)||0<=i&&i<=6&&(0==r||6==r)||2<=r&&r<=4&&2<=i&&i<=4}},getBestMaskPattern:function(){for(var e=0,t=0,r=0;r<8;r++){this.makeImpl(!0,r);var i=a.getLostPoint(this);(0==r||e>i)&&(e=i,t=r)}return t},setupTimingPattern:function(){for(var e=8;e<this.moduleCount-8;e++)null==this.modules[e][6]&&(this.modules[e][6]=e%2==0);for(var t=8;t<this.moduleCount-8;t++)null==this.modules[6][t]&&(this.modules[6][t]=t%2==0)},setupPositionAdjustPattern:function(){for(var e=a.getPatternPosition(this.typeNumber),t=0;t<e.length;t++)for(var r=0;r<e.length;r++){var i=e[t],n=e[r];if(null!=this.modules[i][n])continue;for(var o=-2;o<=2;o++)for(var s=-2;s<=2;s++)this.modules[i+o][n+s]=-2==o||2==o||-2==s||2==s||0==o&&0==s}},setupTypeNumber:function(e){for(var t=a.getBCHTypeNumber(this.typeNumber),r=0;r<18;r++){var i=!e&&1==(t>>r&1);this.modules[Math.floor(r/3)][r%3+this.moduleCount-8-3]=i}for(var n=0;n<18;n++){var o=!e&&1==(t>>n&1);this.modules[n%3+this.moduleCount-8-3][Math.floor(n/3)]=o}},setupTypeInfo:function(e,t){for(var r=a.getBCHTypeInfo(this.errorCorrectLevel<<3|t),i=0;i<15;i++){var n=!e&&1==(r>>i&1);i<6?this.modules[i][8]=n:i<8?this.modules[i+1][8]=n:this.modules[this.moduleCount-15+i][8]=n}for(var o=0;o<15;o++){var s=!e&&1==(r>>o&1);o<8?this.modules[8][this.moduleCount-o-1]=s:o<9?this.modules[8][15-o-1+1]=s:this.modules[8][15-o-1]=s}this.modules[this.moduleCount-8][8]=!e},mapData:function(e,t){for(var r=-1,i=this.moduleCount-1,n=7,o=0,s=this.moduleCount-1;s>0;s-=2)for(6==s&&s--;;){for(var l=0;l<2;l++)if(null==this.modules[i][s-l]){var c=!1;o<e.length&&(c=1==(e[o]>>>n&1));a.getMask(t,i,s-l)&&(c=!c),this.modules[i][s-l]=c,-1==--n&&(o++,n=7)}if((i+=r)<0||this.moduleCount<=i){i-=r,r=-r;break}}}},a.PAD0=236,a.PAD1=17,a.createData=function(e,t,r){for(var i=a.getRSBlocks(e,t),n=new u,o=0;o<r.length;o++){var s=r[o];n.put(s.mode,4),n.put(s.getLength(),a.getLengthInBits(s.mode,e)),s.write(n)}for(var l=0,c=0;c<i.length;c++)l+=i[c].dataCount;if(n.getLengthInBits()>8*l)throw new Error("code length overflow. ("+n.getLengthInBits()+">"+8*l+")");for(n.getLengthInBits()+4<=8*l&&n.put(0,4);n.getLengthInBits()%8!=0;)n.putBit(!1);for(;;){if(n.getLengthInBits()>=8*l)break;if(n.put(a.PAD0,8),n.getLengthInBits()>=8*l)break;n.put(a.PAD1,8)}return a.createBytes(n,i)},a.createBytes=function(e,t){for(var r=0,i=0,n=0,o=new Array(t.length),s=new Array(t.length),l=0;l<t.length;l++){var c=t[l].dataCount;o[l]=new Array(c);for(var f=0;f<o[l].length;f++)o[l][f]=255&e.buffer[i++];var h=t[l].totalCount-c;s[l]=new Array(h);for(var d=0;d<s[l].length;d++)s[l][d]=255&e.buffer[i++];n=Math.max(n,c)}var p=0,g=new Array(n+(i=0));for(var y=0;y<n;y++)for(var v=0;v<t.length;v++)y<o[v].length&&(g[p++]=o[v][y]);for(var b=Math.max.apply(null,s.map(function(e){return e.length})),w=0;w<b;w++)for(var m=0;m<t.length;m++)w<s[m].length&&(g[p++]=s[m][w]);return g},a.getLengthInBits=function(e,t){if(1<=t&&t<10){if(1==e)return 10;if(2==e)return 9;if(e==c)return 8;if(4==e)return 8}else if(t<27){if(1==e)return 12;if(2==e)return 11;if(e==c)return 16;if(4==e)return 10}else if(t<41){if(1==e)return 14;if(2==e)return 13;if(e==c)return 16;if(4==e)return 12}throw new Error("mode:"+e+"; type:"+t)},a.getLostPoint=function(e){for(var t=e.getModuleCount(),r=0,i=0;i<t;i++)for(var n=0;n<t;n++){for(var o=0,s=e.isDark(i,n),l=-1;l<=1;l++)if(!(i+l<0||t<=i+l))for(var c=-1;c<=1;c++)0==l&&0==c||(n+c<0||t<=n+c||(e.isDark(i+l,n+c)==s&&o++));o>5&&(r+=3+o-5)}for(var f=0;f<t-1;f++)for(var h=0;h<t-1;h++){var d=0;e.isDark(f,h)&&d++,e.isDark(f+1,h)&&d++,e.isDark(f,h+1)&&d++,e.isDark(f+1,h+1)&&d++,0!=d&&4!=d||(r+=3)}for(var p=0;p<t;p++){for(var g=0,y=0;y<t;y++)e.isDark(p,y)&&g++;var v=-1;for(var b=t-6;b<=t;b++)g==b&&(r+=40*(v=-v))}for(var w=0;w<t;w++){for(var m=0,_=0;_<t;_++)e.isDark(_,w)&&m++;var k=-1;for(var P=t-6;P<=t;P++)m==P&&(r+=40*(k=-k))}var E=0;for(var x=0;x<t;x++)for(var C=0;C<t;C++)e.isDark(x,C)&&E++;return r+=Math.abs(100*E/t/t-50)/5*10},a.getBCHTypeInfo=function(e){for(var t=e<<10;a.getBCHDigit(t)-a.getBCHDigit(1335)>=0;)t^=1335<<a.getBCHDigit(t)-a.getBCHDigit(1335);return 21522^(e<<10|t)},a.getBCHTypeNumber=function(e){for(var t=e<<12;a.getBCHDigit(t)-a.getBCHDigit(7973)>=0;)t^=7973<<a.getBCHDigit(t)-a.getBCHDigit(7973);return e<<12|t},a.getBCHDigit=function(e){for(var t=0;0!=e;)t++,e>>>=1;return t},a.getPatternPosition=function(e){return[0,0,6,6,26,46,66,13,22,38,54,70,22,38,54,70,86][e]||[]},a.getMask=function(e,t,r){switch(e){case 0:return(t+r)%2==0;case 1:return t%2==0;case 2:return r%3==0;case 3:return(t+r)%3==0;case 4:return(Math.floor(t/2)+Math.floor(r/3))%2==0;case 5:return t*r%2+t*r%3==0;case 6:return(t*r%2+t*r%3)%2==0;case 7:return(t*r%3+(t+r)%2)%2==0}},a.getRSBlocks=function(e,t){var r=a.RS_BLOCK_TABLE[(e-1)*4+t];if(void 0===r)throw new Error("bad rs block @ typeNumber:"+e+"/errorCorrectLevel:"+t);if("number"==typeof r[0])return[{totalCount:r[0],dataCount:r[1]}];var i=[];for(var n=0;n<r.length;n+=3)for(var o=0;o<r[n];o++)i.push({totalCount:r[n+1],dataCount:r[n+2]});return i},a.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],a.getPatternPosition=function(e){return[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]][e-1]||[]},a.createData=a.createData;var c=4;function s(e){this.mode=c,this.data=e}s.prototype={getLength:function(){return this.data.length},write:function(e){for(var t=0,r=this.data.length;t<r;t++)e.put(this.data.charCodeAt(t),8)}};function u(){this.buffer=[],this.length=0}u.prototype={get:function(e){return 1==(this.buffer[Math.floor(e/8)]>>>7-e%8&1)},put:function(e,t){for(var r=0;r<t;r++)this.putBit(1==(e>>>t-r-1&1))},getLengthInBits:function(){return this.length},putBit:function(e){var t=Math.floor(this.length/8);this.buffer.length<=t&&this.buffer.push(0),e&&(this.buffer[t]|=128>>>this.length%8),this.length++}};return a}());
+
+function drawQR(containerId, text, size) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  var canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  el.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  var qr = new QRCodeGen(0, 1); // type 0 = auto, errorCorrectLevel M
+  qr.addData(text);
+  qr.make();
+  var count = qr.getModuleCount();
+  var cell = size / count;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#08111f';
+  for (var r = 0; r < count; r++) {
+    for (var c = 0; c < count; c++) {
+      if (qr.isDark(r, c)) {
+        ctx.fillRect(Math.floor(c * cell), Math.floor(r * cell),
+          Math.ceil(cell), Math.ceil(cell));
+      }
+    }
+  }
+}
+</script>
+
+<!-- jsPDF for certificate export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  (merged from styles.css + ui-kit.css)
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --navy-950:#08111f;
+  --navy-900:#0b1a2b;
+  --navy-800:#132f4c;
+  --navy-700:#1b3b5d;
+  --gold-500:#c9a24a;
+  --gold-400:#e5c97a;
+  --gold-300:#f5d37a;
+  --silver-300:#c0c4cc;
+  --white:#ffffff;
+  --gray-50:#f6f6f8;
+  --gray-100:#ececf1;
+  --gray-200:#dfe4ec;
+  --gray-300:#c8cbd3;
+  --gray-500:#7f8794;
+  --success:#1f8f63;
+  --danger:#b23b3b;
+  --warning:#b87c1f;
+  --shadow-xl:0 24px 48px rgba(0,0,0,.32);
+  --shadow-lg:0 16px 32px rgba(0,0,0,.22);
+  --shadow-gold:0 10px 32px rgba(201,162,74,.28);
+  --radius-xl:28px;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --font-display:"Playfair Display", Georgia, serif;
+  --font-ui:"Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-ui);
+  color:var(--white);
+  background:
+    radial-gradient(ellipse 80% 60% at 90% -10%, rgba(229,201,122,.13), transparent),
+    radial-gradient(ellipse 50% 40% at 10% 100%, rgba(27,59,93,.5), transparent),
+    linear-gradient(160deg,#06101d 0%,#0d1e30 45%,#111d30 100%);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+button,input,select,textarea{font:inherit;outline:none}
+a{color:inherit;text-decoration:none}
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════ */
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════════ */
+.sidebar{
+  position:sticky;top:0;height:100vh;
+  border-right:1px solid rgba(229,201,122,.10);
+  padding:24px 18px;
+  background:rgba(6,10,18,.7);
+  backdrop-filter:blur(18px);
+  display:flex;flex-direction:column;gap:0;
+  overflow-y:auto;
+}
+.brand{display:flex;align-items:center;gap:14px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:24px}
+.brand-icon{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-400),var(--gold-500));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:var(--shadow-gold);
+}
+.brand-text .name{font-family:var(--font-display);font-size:15px;font-weight:700;line-height:1.1}
+.brand-text .sub{color:var(--gray-300);font-size:11px;margin-top:3px;letter-spacing:.08em}
+.nav-label{color:var(--gray-500);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 10px 4px}
+.nav{display:grid;gap:6px;margin-bottom:28px}
+.nav-btn{
+  display:flex;align-items:center;gap:12px;
+  border:1px solid transparent;background:transparent;
+  color:var(--gray-300);padding:11px 14px;border-radius:12px;
+  text-align:left;cursor:pointer;transition:all .18s ease;
+  font-size:13.5px;font-weight:500;
+}
+.nav-btn .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-btn:hover{color:var(--white);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
+.nav-btn.active{
+  color:var(--gold-300);
+  background:linear-gradient(135deg,rgba(201,162,74,.16),rgba(19,47,76,.4));
+  border-color:rgba(229,201,122,.28);
+}
+.sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.05)}
+.wallet-badge{
+  padding:10px 12px;border-radius:12px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  font-size:12px;
+}
+.wallet-badge .wlabel{color:var(--gray-500);font-size:11px;margin-bottom:4px}
+.wallet-addr{
+  font-family:var(--font-mono);font-size:10.5px;color:var(--gold-400);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;display:block;cursor:pointer;
+}
+.wallet-addr:hover{color:var(--gold-300)}
+.connect-btn{
+  width:100%;margin-top:10px;padding:11px;border-radius:12px;border:1px solid rgba(229,201,122,.3);
+  background:linear-gradient(135deg,rgba(201,162,74,.16),rgba(19,47,76,.3));
+  color:var(--gold-300);font-weight:600;font-size:13px;cursor:pointer;
+  transition:all .2s;
+}
+.connect-btn:hover{background:linear-gradient(135deg,rgba(201,162,74,.28),rgba(19,47,76,.5));transform:translateY(-1px)}
+.wallet-action-btn{
+  padding:9px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.05);color:var(--gray-300);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .18s;text-align:center;
+}
+.wallet-action-btn:hover{background:rgba(255,255,255,.1);color:var(--white);transform:translateY(-1px)}
+.wallet-action-btn.switch:hover{border-color:rgba(229,201,122,.35);color:var(--gold-300)}
+.wallet-action-btn.disconnect:hover{border-color:rgba(178,59,59,.4);color:#e07070;background:rgba(178,59,59,.1)}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN WORKSPACE
+═══════════════════════════════════════════════════════════════ */
+.workspace{padding:32px 36px;overflow-y:auto}
+.screen{display:none}
+.screen.active{display:block}
+
+/* top bar */
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:32px}
+.topbar-left .eyebrow{color:var(--gold-400);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.topbar-left h1{font-family:var(--font-display);font-size:36px;font-weight:700;line-height:1.1}
+.topbar-left .sub{color:var(--gray-300);font-size:14px;margin-top:8px;line-height:1.6}
+.network-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:999px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  font-size:13px;color:var(--gray-300);
+}
+.net-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-500);transition:.3s}
+.net-dot.connected{background:var(--success);box-shadow:0 0 8px rgba(31,143,99,.6)}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════════════════════ */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:28px}
+.hero-card{
+  border-radius:var(--radius-xl);padding:28px;
+  background:linear-gradient(160deg,var(--navy-800),var(--navy-900));
+  border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow-lg);
+  cursor:pointer;transition:all .2s;
+}
+.hero-card:hover{transform:translateY(-3px);border-color:rgba(229,201,122,.24);box-shadow:var(--shadow-gold)}
+.hero-card .hc-icon{font-size:32px;margin-bottom:16px}
+.hero-card h3{font-family:var(--font-display);font-size:20px;margin-bottom:8px}
+.hero-card p{color:var(--gray-300);font-size:13.5px;line-height:1.6}
+.hero-card .hc-link{color:var(--gold-400);font-size:13px;font-weight:600;margin-top:16px;display:inline-block}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-box{
+  padding:20px;border-radius:var(--radius-lg);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+}
+.stat-box .sv{font-family:var(--font-display);font-size:32px;color:var(--gold-400)}
+.stat-box .sl{color:var(--gray-300);font-size:12.5px;margin-top:4px}
+
+/* ═══════════════════════════════════════════════════════════════
+   PANELS / CARDS
+═══════════════════════════════════════════════════════════════ */
+.panel{
+  border-radius:var(--radius-xl);padding:26px;
+  background:linear-gradient(160deg,rgba(19,47,76,.6),rgba(11,26,43,.8));
+  border:1px solid rgba(255,255,255,.07);box-shadow:var(--shadow-lg);
+  backdrop-filter:blur(8px);
+}
+.panel-title{font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.panel-title .pt-icon{font-size:18px}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════════════════════════════ */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12.5px;font-weight:500;color:var(--gray-300);margin-bottom:7px;letter-spacing:.04em}
+.form-input,.form-select{
+  width:100%;padding:13px 16px;border-radius:var(--radius-md);
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.05);color:var(--white);
+  font-size:14px;transition:border-color .18s;
+}
+.form-input::placeholder{color:var(--gray-500)}
+.form-input:focus,.form-select:focus{border-color:rgba(229,201,122,.4);background:rgba(255,255,255,.07)}
+.form-select option{background:#0d1e30;color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* file drop zone */
+.drop-zone{
+  border:2px dashed rgba(229,201,122,.25);border-radius:var(--radius-lg);
+  padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;
+  background:rgba(201,162,74,.04);position:relative;
+}
+.drop-zone:hover,.drop-zone.dragover{border-color:rgba(229,201,122,.55);background:rgba(201,162,74,.09)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-icon{font-size:40px;margin-bottom:12px}
+.drop-main{font-size:15px;font-weight:600;margin-bottom:6px}
+.drop-sub{color:var(--gray-300);font-size:13px}
+.file-selected{background:rgba(31,143,99,.12);border-color:rgba(31,143,99,.4)}
+.file-selected .drop-icon::after{content:" ✓"}
+
+/* hash display */
+.hash-box{
+  font-family:var(--font-mono);font-size:12px;
+  padding:12px 16px;border-radius:var(--radius-md);
+  background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);
+  word-break:break-all;color:var(--gold-300);line-height:1.5;
+}
+
+/* buttons */
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 22px;border-radius:var(--radius-md);border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-400),var(--gold-500));
+  color:#101728;font-weight:700;font-size:14px;
+  box-shadow:var(--shadow-gold);transition:all .2s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,162,74,.35)}
+.btn-primary:disabled{opacity:.5;pointer-events:none}
+.btn-secondary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 20px;border-radius:var(--radius-md);
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
+  color:var(--white);font-weight:500;font-size:14px;cursor:pointer;transition:all .2s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.btn-danger{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 20px;border-radius:var(--radius-md);border:1px solid rgba(178,59,59,.3);
+  background:rgba(178,59,59,.12);color:#e07070;font-weight:500;font-size:14px;cursor:pointer;transition:all .2s;
+}
+.btn-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT / CERTIFICATE CARD
+═══════════════════════════════════════════════════════════════ */
+.result-card{
+  border-radius:var(--radius-xl);overflow:hidden;
+  border:1px solid rgba(229,201,122,.25);
+  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(229,201,122,.1);
+  display:none;margin-top:24px;
+}
+.result-card.visible{display:block}
+.result-card.error{border-color:rgba(178,59,59,.3)}
+.rc-header{
+  padding:22px 26px;
+  background:linear-gradient(135deg,rgba(201,162,74,.18),rgba(19,47,76,.5));
+  border-bottom:1px solid rgba(229,201,122,.15);
+  display:flex;align-items:center;gap:16px;
+}
+.rc-header.error{background:linear-gradient(135deg,rgba(178,59,59,.18),rgba(19,47,76,.5));border-bottom-color:rgba(178,59,59,.2)}
+.rc-badge{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-400),var(--gold-500));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;box-shadow:var(--shadow-gold);
+}
+.rc-badge.error{background:linear-gradient(135deg,#b23b3b,#7a1f1f)}
+.rc-title{font-family:var(--font-display);font-size:22px;font-weight:700}
+.rc-subtitle{color:var(--gray-300);font-size:13px;margin-top:3px}
+.rc-body{padding:24px 26px;background:rgba(6,12,22,.7);backdrop-filter:blur(10px)}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.rc-field{padding:14px 16px;border-radius:var(--radius-md);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.rc-field .rf-label{font-size:11px;color:var(--gray-500);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.rc-field .rf-value{font-size:14px;font-weight:500;word-break:break-all}
+.rc-field .rf-value.mono{font-family:var(--font-mono);font-size:12px;color:var(--gold-300)}
+.rc-field.full{grid-column:1/-1}
+.rc-instructions{
+  padding:16px;border-radius:var(--radius-md);
+  background:rgba(31,143,99,.09);border:1px solid rgba(31,143,99,.2);
+  font-size:13px;line-height:1.7;color:var(--gray-200);
+}
+.rc-instructions strong{color:var(--gold-300)}
+
+/* status badge */
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;
+}
+.status-badge.success{background:rgba(31,143,99,.18);color:#4ecca3;border:1px solid rgba(31,143,99,.3)}
+.status-badge.fail{background:rgba(178,59,59,.18);color:#e07070;border:1px solid rgba(178,59,59,.3)}
+.status-badge.pending{background:rgba(201,162,74,.14);color:var(--gold-300);border:1px solid rgba(201,162,74,.25)}
+.status-badge.revoked{background:rgba(178,59,59,.12);color:#e07070}
+
+/* ═══════════════════════════════════════════════════════════════
+   VERIFY SCREEN
+═══════════════════════════════════════════════════════════════ */
+.verify-methods{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.method-tab{
+  padding:18px;border-radius:var(--radius-lg);
+  border:2px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.method-tab.active{border-color:rgba(229,201,122,.35);background:rgba(201,162,74,.09)}
+.method-tab .mt-icon{font-size:28px;margin-bottom:8px}
+.method-tab .mt-label{font-size:14px;font-weight:600}
+.method-tab .mt-sub{font-size:12px;color:var(--gray-300);margin-top:4px}
+
+/* ═══════════════════════════════════════════════════════════════
+   REGISTRY / TABLE
+═══════════════════════════════════════════════════════════════ */
+.filter-bar{display:flex;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.filter-bar .form-input{flex:1;min-width:180px}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.07)}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:12px 16px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gray-500);background:rgba(0,0,0,.2);text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;cursor:pointer}
+tbody tr:hover{background:rgba(255,255,255,.04)}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:13px 16px;font-size:13.5px;vertical-align:middle}
+.td-mono{font-family:var(--font-mono);font-size:11.5px;color:var(--gold-300)}
+.td-title{font-weight:500}
+.td-addr{font-family:var(--font-mono);font-size:11px;color:var(--gray-300)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray-500)}
+.empty-state .es-icon{font-size:48px;margin-bottom:16px;opacity:.4}
+.empty-state p{font-size:14px}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING / TOAST
+═══════════════════════════════════════════════════════════════ */
+.spinner{
+  display:inline-block;width:20px;height:20px;
+  border:2px solid rgba(255,255,255,.2);border-top-color:var(--gold-400);
+  border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast-container{position:fixed;bottom:28px;right:28px;display:flex;flex-direction:column;gap:10px;z-index:1000;pointer-events:none}
+.toast{
+  padding:14px 18px;border-radius:14px;font-size:13.5px;font-weight:500;
+  box-shadow:var(--shadow-xl);pointer-events:all;
+  animation:slideUp .3s ease;max-width:340px;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.success{background:rgba(15,35,20,.95);border:1px solid rgba(31,143,99,.4);color:#4ecca3}
+.toast.error{background:rgba(30,12,12,.95);border:1px solid rgba(178,59,59,.4);color:#e07070}
+.toast.info{background:rgba(8,18,36,.95);border:1px solid rgba(229,201,122,.3);color:var(--gold-300)}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════════════════════════════
+   MISC
+═══════════════════════════════════════════════════════════════ */
+.divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:22px 0}
+.text-gold{color:var(--gold-400)}
+.text-muted{color:var(--gray-300)}
+.text-mono{font-family:var(--font-mono)}
+.badge-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pagination{display:flex;align-items:center;gap:10px;margin-top:18px;justify-content:flex-end}
+.page-btn{
+  padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);color:var(--gray-300);cursor:pointer;font-size:13px;transition:.15s;
+}
+.page-btn:hover{background:rgba(255,255,255,.09);color:#fff}
+.page-btn:disabled{opacity:.3;pointer-events:none}
+.page-info{font-size:13px;color:var(--gray-500)}
+
+/* modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  z-index:500;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:linear-gradient(160deg,var(--navy-800),var(--navy-900));
+  border:1px solid rgba(229,201,122,.18);border-radius:var(--radius-xl);
+  padding:28px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:var(--shadow-xl);
+}
+.modal-title{font-family:var(--font-display);font-size:22px;margin-bottom:20px}
+.modal-close{float:right;background:none;border:none;color:var(--gray-300);cursor:pointer;font-size:22px;line-height:1}
+
+/* ── Wallet Picker Modal ─────────────────────────────────────── */
+#walletModal .modal { max-width: 420px; }
+.wallet-picker-title {
+  font-family: var(--font-display); font-size: 22px; color: var(--white);
+  margin-bottom: 6px;
+}
+.wallet-picker-sub {
+  font-size: 13px; color: var(--gray-500); margin-bottom: 22px;
+}
+.wallet-option {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radius-md);
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  cursor: pointer; transition: background .15s, border-color .15s;
+  margin-bottom: 10px; width: 100%;
+  color: var(--white); font-family: var(--font-ui); font-size: 15px;
+}
+.wallet-option:hover { background: rgba(229,201,122,.10); border-color: rgba(229,201,122,.35); }
+.wallet-option .wo-icon { font-size: 28px; width: 36px; text-align: center; flex-shrink: 0; }
+.wallet-option .wo-name { font-weight: 600; }
+.wallet-option .wo-desc { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.wallet-divider {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--gray-500); font-size: 12px; margin: 14px 0;
+}
+.wallet-divider::before, .wallet-divider::after {
+  content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08);
+}
+#wcQrSection { text-align: center; }
+#wcQrSection .qr-label {
+  font-size: 12px; color: var(--gray-500); margin-top: 10px;
+}
+#qrCodeContainer {
+  display: inline-block; background: #fff; padding: 14px;
+  border-radius: var(--radius-md); margin: 10px 0;
+}
+#qrCodeContainer canvas, #qrCodeContainer img { display: block; }
+.wc-wallet-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; justify-content: center; }
+.wc-wallet-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 14px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  cursor: pointer; color: var(--white); font-size: 13px; font-family: var(--font-ui);
+  transition: background .15s;
+}
+.wc-wallet-btn:hover { background: rgba(229,201,122,.12); }
+.wc-wallet-btn .wbi { font-size: 18px; }
+.wc-status {
+  font-size: 13px; color: var(--gold-400); margin-top: 12px;
+  display: none;
+}
+
+/* responsive */
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid rgba(255,255,255,.07);flex-direction:row;flex-wrap:wrap}
+  .hero-grid,.stats-row{grid-template-columns:1fr}
+  .verify-methods,.form-row,.rc-grid{grid-template-columns:1fr}
+  .workspace{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ SHELL ══════════════════════ -->
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⬡</div>
+      <div class="brand-text">
+        <div class="name">Sayari Ledger</div>
+        <div class="sub">Document Tokenization</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Navigation</div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="navigate('home')" data-screen="home">
+        <span class="icon">🏠</span> Overview
+      </button>
+      <button class="nav-btn" onclick="navigate('tokenize')" data-screen="tokenize">
+        <span class="icon">🔐</span> Tokenize Document
+      </button>
+      <button class="nav-btn" onclick="navigate('verify')" data-screen="verify">
+        <span class="icon">🔍</span> Verify Document
+      </button>
+      <button class="nav-btn" onclick="navigate('registry')" data-screen="registry">
+        <span class="icon">📋</span> Registry
+      </button>
+    </nav>
+
+    <div class="nav-label">Contract</div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="navigate('config')" data-screen="config">
+        <span class="icon">⚙️</span> Configuration
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <!-- disconnected state -->
+      <div id="walletDisconnected">
+        <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
+          🔗 Connect Wallet
+        </button>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray-500)">
+          <div class="net-dot" id="netDot"></div>
+          <span id="netLabel">Disconnected</span>
+        </div>
+      </div>
+      <!-- connected state -->
+      <div id="walletConnected" style="display:none">
+        <div class="wallet-badge">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="wlabel">Connected Wallet</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px">
+              <div class="net-dot connected" id="netDot"></div>
+              <span id="netLabel" style="color:var(--gray-300)">—</span>
+            </div>
+          </div>
+          <div class="wallet-addr" id="sidebarAddr" onclick="copyToClipboard(walletAddress)" title="Click to copy full address">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <button class="wallet-action-btn switch" onclick="switchWallet()" title="Switch wallet">
+            🔄 Switch
+          </button>
+          <button class="wallet-action-btn disconnect" onclick="disconnectWallet()" title="Disconnect wallet">
+            ⏏ Disconnect
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── WORKSPACE ── -->
+  <main class="workspace">
+
+    <!-- ════════ HOME ════════ -->
+    <section class="screen active" id="screen-home">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">Sayari Global Holding</div>
+          <h1>Document Ledger<br><span class="text-gold">Tokenization Factory</span></h1>
+          <p class="sub">Institutional-grade on-chain document certification and integrity verification.</p>
+        </div>
+        <div class="network-pill">
+          <span class="net-dot" id="netDot2"></span>
+          <span id="netLabel2">Not connected</span>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-card" onclick="navigate('tokenize')">
+          <div class="hc-icon">🔐</div>
+          <h3>Tokenize Document</h3>
+          <p>Hash a document client-side and anchor it permanently on the Ethereum blockchain with full metadata.</p>
+          <span class="hc-link">Start tokenizing →</span>
+        </div>
+        <div class="hero-card" onclick="navigate('verify')">
+          <div class="hc-icon">🔍</div>
+          <h3>Verify Integrity</h3>
+          <p>Upload a file or enter a hash to check its authenticity against the on-chain registry instantly.</p>
+          <span class="hc-link">Verify document →</span>
+        </div>
+        <div class="hero-card" onclick="navigate('registry')">
+          <div class="hc-icon">📋</div>
+          <h3>Registry Browser</h3>
+          <p>Browse, search, and filter all certified documents in the smart contract registry.</p>
+          <span class="hc-link">Browse registry →</span>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="sv" id="statTotal">—</div>
+          <div class="sl">Total Certified Documents</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" id="statMine">—</div>
+          <div class="sl">My Certifications</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" id="statNetwork">—</div>
+          <div class="sl">Network</div>
+        </div>
+        <div class="stat-box">
+          <div class="sv" id="statBlock">—</div>
+          <div class="sl">Latest Block</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ TOKENIZE ════════ -->
+    <section class="screen" id="screen-tokenize">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">Step 1 of 2</div>
+          <h1>Tokenize <span class="text-gold">Document</span></h1>
+          <p class="sub">The file is hashed locally in your browser — no document data is ever sent to any server. Cost Crypto (USDT 5) per document.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:22px">
+        <div>
+          <div class="panel" style="margin-bottom:18px">
+            <div class="panel-title"><span class="pt-icon">📁</span> Select Document</div>
+            <div class="drop-zone" id="dropZone" ondragover="ev.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+              <input type="file" id="fileInput" onchange="handleFileSelect(this)">
+              <div class="drop-icon" id="dropIcon">📄</div>
+              <div class="drop-main" id="dropMain">Drop file here or click to browse</div>
+              <div class="drop-sub" id="dropSub">Any file type accepted • SHA-256 computed locally</div>
+            </div>
+            <div id="hashResult" style="display:none;margin-top:14px">
+              <div class="form-label">SHA-256 Hash (bytes32)</div>
+              <div class="hash-box" id="hashDisplay"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title"><span class="pt-icon">📝</span> Metadata <span style="color:var(--gray-500);font-size:12px;font-weight:400">(optional)</span></div>
+            <div class="form-group">
+              <label class="form-label">Document Title</label>
+              <input type="text" class="form-input" id="metaTitle" placeholder="e.g. SAM Escrow Agreement v2.1">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Version</label>
+                <input type="text" class="form-input" id="metaVersion" placeholder="v1.0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Expiry Date (optional)</label>
+                <input type="date" class="form-input" id="metaExpiry">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">IPFS CID (optional)</label>
+              <input type="text" class="form-input" id="metaIPFS" placeholder="Qm... or bafybe...">
+            </div>
+
+            <div class="btn-actions">
+              <button class="btn-primary" id="certifyBtn" onclick="certifyDocument()" disabled>
+                <span>🔐</span> Certify on Blockchain
+              </button>
+              <button class="btn-secondary" onclick="clearForm()">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- result -->
+        <div>
+          <div class="panel" style="min-height:300px">
+            <div class="panel-title"><span class="pt-icon">ℹ️</span> How it works</div>
+            <ol style="padding-left:18px;color:var(--gray-300);font-size:13.5px;line-height:2">
+              <li>Select your document — it never leaves your browser</li>
+              <li>SHA-256 hash is computed in-browser</li>
+              <li>Connect your wallet (MetaMask, Trust, Rainbow or any WalletConnect wallet)</li>
+              <li>Click <strong style="color:var(--gold-400)">Certify on Blockchain</strong></li>
+              <li>Confirm the transaction in your wallet</li>
+              <li>Receive your on-chain certificate</li>
+            </ol>
+            <hr class="divider">
+            <p style="font-size:12.5px;color:var(--gray-500);line-height:1.7">
+              The contract stores only your document hash, wallet address, timestamp and optional metadata. 
+              Document contents are never stored on-chain or transmitted.
+            </p>
+          </div>
+          <div id="txSpinner" style="display:none;text-align:center;padding:40px">
+            <div class="spinner" style="width:40px;height:40px;margin:0 auto 16px"></div>
+            <div style="color:var(--gray-300);font-size:14px" id="txSpinnerMsg">Waiting for transaction...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- certificate result -->
+      <div class="result-card" id="certResult">
+        <div class="rc-header" id="certResultHeader">
+          <div class="rc-badge" id="certResultBadge">✅</div>
+          <div>
+            <div class="rc-title" id="certResultTitle">Document Certified</div>
+            <div class="rc-subtitle" id="certResultSub">Successfully anchored on the Ethereum blockchain</div>
+          </div>
+        </div>
+        <div class="rc-body">
+          <div class="rc-grid" id="certResultGrid"></div>
+          <div class="rc-instructions" id="certInstructions"></div>
+          <div class="btn-actions">
+            <button class="btn-primary" onclick="downloadCertPDF()">
+              <span>📄</span> Save as PDF Certificate
+            </button>
+            <button class="btn-secondary" onclick="clearForm()">
+              <span>🔄</span> New Document
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ VERIFY ════════ -->
+    <section class="screen" id="screen-verify">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">Integrity Check</div>
+          <h1>Verify <span class="text-gold">Document</span></h1>
+          <p class="sub">Confirm a document's authenticity against the on-chain registry.</p>
+        </div>
+      </div>
+
+      <div class="verify-methods">
+        <div class="method-tab active" id="vtab-file" onclick="setVerifyMethod('file')">
+          <div class="mt-icon">📁</div>
+          <div class="mt-label">Upload File</div>
+          <div class="mt-sub">Hash is computed automatically</div>
+        </div>
+        <div class="method-tab" id="vtab-hash" onclick="setVerifyMethod('hash')">
+          <div class="mt-icon">🔢</div>
+          <div class="mt-label">Enter Hash Directly</div>
+          <div class="mt-sub">Paste a known SHA-256 or bytes32 hash</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:18px">
+        <div id="v-file-section">
+          <div class="form-label">Upload Document to Verify</div>
+          <div class="drop-zone" style="margin-bottom:14px">
+            <input type="file" id="verifyFileInput" onchange="handleVerifyFile(this)">
+            <div class="drop-icon">🔍</div>
+            <div class="drop-main" id="vDropMain">Drop file here to hash and verify</div>
+            <div class="drop-sub">Hash computed locally, then checked against registry</div>
+          </div>
+          <div id="vHashPreview" style="display:none">
+            <div class="form-label">Computed Hash</div>
+            <div class="hash-box" id="vHashBox"></div>
+          </div>
+        </div>
+        <div id="v-hash-section" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Document Hash (bytes32 hex)</label>
+            <input type="text" class="form-input" id="verifyHashInput" placeholder="0x + 64 hex chars or plain 64 hex chars" style="font-family:var(--font-mono)">
+          </div>
+        </div>
+        <div class="btn-actions" style="margin-top:14px">
+          <button class="btn-primary" id="verifyBtn" onclick="verifyDocument()">
+            <span>🔍</span> Verify on Chain
+          </button>
+        </div>
+      </div>
+
+      <div class="result-card" id="verifyResult">
+        <div class="rc-header" id="verifyResultHeader">
+          <div class="rc-badge" id="verifyResultBadge">🔍</div>
+          <div>
+            <div class="rc-title" id="verifyResultTitle">Verification Result</div>
+            <div class="rc-subtitle" id="verifyResultSub"></div>
+          </div>
+        </div>
+        <div class="rc-body">
+          <div class="rc-grid" id="verifyResultGrid"></div>
+          <div class="rc-instructions" id="verifyInstructions" style="display:none"></div>
+          <div class="btn-actions">
+            <button class="btn-primary" onclick="downloadVerifyPDF()" id="verifyPDFBtn" style="display:none">
+              <span>📄</span> Save Verification Report as PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ REGISTRY ════════ -->
+    <section class="screen" id="screen-registry">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">On-Chain Registry</div>
+          <h1>Document <span class="text-gold">Registry</span></h1>
+          <p class="sub">Browse all certified documents stored in the smart contract.</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" class="form-input" id="regSearch" placeholder="Filter by title, hash, or address…" oninput="filterRegistry()">
+        <select class="form-input" id="regFilter" style="width:160px" onchange="filterRegistry()">
+          <option value="all">All Documents</option>
+          <option value="mine">My Documents</option>
+          <option value="active">Active Only</option>
+          <option value="revoked">Revoked Only</option>
+        </select>
+        <button class="btn-secondary" onclick="loadRegistry()">
+          <span>🔄</span> Refresh
+        </button>
+        <button class="btn-primary" onclick="navigate('tokenize')">
+          <span>➕</span> New
+        </button>
+      </div>
+
+      <div class="panel">
+        <div id="regLoading" style="text-align:center;padding:40px;display:none">
+          <div class="spinner" style="width:36px;height:36px;margin:0 auto 14px"></div>
+          <div style="color:var(--gray-300)">Loading registry…</div>
+        </div>
+        <div id="regEmpty" class="empty-state" style="display:none">
+          <div class="es-icon">📋</div>
+          <p>No documents found. Connect your wallet and certify a document to get started.</p>
+        </div>
+        <div class="table-wrap" id="regTableWrap" style="display:none">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title / Hash</th>
+                <th>Certifier</th>
+                <th>Timestamp</th>
+                <th>Version</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="regTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="regPagination" style="display:none">
+          <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">← Prev</button>
+          <span class="page-info" id="pageInfo"></span>
+          <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ CONFIG ════════ -->
+    <section class="screen" id="screen-config">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">Settings</div>
+          <h1>Contract <span class="text-gold">Configuration</span></h1>
+          <p class="sub">Connect to your deployed DocumentRegistry smart contract.</p>
+        </div>
+      </div>
+      <div class="panel" style="max-width:600px">
+        <div class="panel-title"><span class="pt-icon">📜</span> Smart Contract</div>
+        <div class="form-group">
+          <label class="form-label">Contract Address (Ethereum)</label>
+          <input type="text" class="form-input text-mono" id="cfgContract" placeholder="0x…" value="">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Network</label>
+          <select class="form-select" id="cfgNetwork">
+            <option value="1" selected>Ethereum Mainnet (1)</option>
+            <option value="11155111">Sepolia Testnet (11155111)</option>
+            <option value="137">Polygon Mainnet (137)</option>
+            <option value="80001">Mumbai Testnet (80001)</option>
+            <option value="custom">Custom RPC</option>
+          </select>
+        </div>
+        <div class="form-group" id="customRpcGroup" style="display:none">
+          <label class="form-label">Custom RPC URL</label>
+          <input type="text" class="form-input" id="cfgRPC" placeholder="https://…">
+        </div>
+        <div class="btn-actions">
+          <button class="btn-primary" onclick="saveConfig()"><span>💾</span> Save & Connect</button>
+        </div>
+        <hr class="divider">
+        <div class="panel-title"><span class="pt-icon">🌐</span> Deployed Contracts</div>
+        <p style="font-size:13px;color:var(--gray-300);margin-bottom:16px">Click a row to load that contract into the configuration above.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Network</th>
+                <th>Contract Address</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="deployedContractsTable">
+              <tr onclick="selectDeployedContract('1','0x16AA9B509D1568BE832af8424b026B4B94183DeA')" style="cursor:pointer">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#627EEA;flex-shrink:0"></div>
+                    <div>
+                      <div style="font-weight:600;font-size:13.5px">Ethereum Mainnet</div>
+                      <div style="font-size:11px;color:var(--gray-500)">Chain ID: 1</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="td-mono" style="font-size:11.5px">0x16AA9B509D1568BE832af8424b026B4B94183DeA</span></td>
+                <td><span class="status-badge success" style="font-size:11px">● Live</span></td>
+                <td>
+                  <div style="display:flex;gap:8px">
+                    <a href="https://etherscan.io/address/0x16AA9B509D1568BE832af8424b026B4B94183DeA" target="_blank" onclick="event.stopPropagation()" style="font-size:11.5px;color:var(--gold-400);text-decoration:none">Etherscan ↗</a>
+                  </div>
+                </td>
+              </tr>
+              <tr style="opacity:.45">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#8247E5;flex-shrink:0"></div>
+                    <div>
+                      <div style="font-weight:600;font-size:13.5px">Polygon Mainnet</div>
+                      <div style="font-size:11px;color:var(--gray-500)">Chain ID: 137</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-size:12px;color:var(--gray-500)">Not yet deployed</span></td>
+                <td><span class="status-badge" style="font-size:11px;background:rgba(255,255,255,.06);color:var(--gray-500);border:1px solid rgba(255,255,255,.08)">— Pending</span></td>
+                <td></td>
+              </tr>
+              <tr style="opacity:.45">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#5F7ADB;flex-shrink:0"></div>
+                    <div>
+                      <div style="font-weight:600;font-size:13.5px">Sepolia Testnet</div>
+                      <div style="font-size:11px;color:var(--gray-500)">Chain ID: 11155111</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-size:12px;color:var(--gray-500)">Not yet deployed</span></td>
+                <td><span class="status-badge" style="font-size:11px;background:rgba(255,255,255,.06);color:var(--gray-500);border:1px solid rgba(255,255,255,.08)">— Pending</span></td>
+                <td></td>
+              </tr>
+              <tr style="opacity:.45">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#E84142;flex-shrink:0"></div>
+                    <div>
+                      <div style="font-weight:600;font-size:13.5px">Avalanche C-Chain</div>
+                      <div style="font-size:11px;color:var(--gray-500)">Chain ID: 43114</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-size:12px;color:var(--gray-500)">Not yet deployed</span></td>
+                <td><span class="status-badge" style="font-size:11px;background:rgba(255,255,255,.06);color:var(--gray-500);border:1px solid rgba(255,255,255,.08)">— Pending</span></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:12px;color:var(--gray-500);margin-top:12px">✓ Verified on Etherscan &nbsp;·&nbsp; Contract: DocumentRegistry.sol &nbsp;·&nbsp; Compiler: Solidity 0.8.20</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ════════ DOCUMENT DETAIL MODAL ════════ -->
+<div class="modal-overlay" id="docModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Document Record</div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ════════ TOAST ════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════════════════ JAVASCRIPT ════════════════════════════ -->
+<script>
+// ── CONTRACT ABI ──────────────────────────────────────────────────────────────
+const CONTRACT_ABI = [
+  "function certify(bytes32 docHash, string calldata title, string calldata ipfsCID, string calldata version, uint256 expiry) external",
+  "function verify(bytes32 docHash) external view returns (tuple(bytes32 docHash, address certifier, uint256 timestamp, string title, string ipfsCID, string version, uint256 expiry, bool revoked))",
+  "function exists(bytes32 docHash) external view returns (bool)",
+  "function totalDocuments() external view returns (uint256)",
+  "function listDocuments(uint256 offset, uint256 limit) external view returns (tuple(bytes32 docHash, address certifier, uint256 timestamp, string title, string ipfsCID, string version, uint256 expiry, bool revoked)[])",
+  "function listByCertifier(address certifier, uint256 offset, uint256 limit) external view returns (tuple(bytes32 docHash, address certifier, uint256 timestamp, string title, string ipfsCID, string version, uint256 expiry, bool revoked)[])",
+  "function revoke(bytes32 docHash) external",
+  "function allHashes() external view returns (bytes32[])",
+  "event DocumentCertified(bytes32 indexed docHash, address indexed certifier, uint256 timestamp, string title)"
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let provider = null;
+let signer = null;
+let contract = null;
+let walletAddress = null;
+let currentFileHash = null;
+let verifyFileHash = null;
+let verifyMethod = 'file';
+let lastCertData = null;
+let lastVerifyData = null;
+let regPage = 0;
+const REG_PAGE_SIZE = 20;
+let allRegDocs = [];
+let filteredRegDocs = [];
+
+// Config (load from localStorage)
+let CONTRACT_ADDRESS = localStorage.getItem('sdl_contract') || '';
+let NETWORK_ID = localStorage.getItem('sdl_network') || '1';
+
+const NETWORK_NAMES = {
+  '1': 'Ethereum Mainnet', '11155111': 'Sepolia Testnet',
+  '137': 'Polygon', '80001': 'Mumbai Testnet'
+};
+
+// ── PAYMENT CONFIG ────────────────────────────────────────────────────────────
+const MASTER_WALLET   = '0x75A10bd22634Ab072b609578Bfa0C9554D18E361';
+const FEE_USDT        = 5;          // $5 USDT flat fee per certification
+// ETH/USD price is fetched live; fallback keeps things safe if API is down
+let   ethPriceUSD     = null;       // populated by fetchEthPrice()
+let   feeInWei        = null;       // set just before each certify tx
+
+async function fetchEthPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+    const j = await r.json();
+    ethPriceUSD = j.ethereum.usd;
+    console.log('ETH price: $' + ethPriceUSD);
+  } catch(e) {
+    // Fallback: use a conservative $3000 so we never under-charge
+    ethPriceUSD = 3000;
+    console.warn('ETH price fetch failed, using fallback $' + ethPriceUSD);
+  }
+  feeInWei = ethers.utils.parseEther((FEE_USDT / ethPriceUSD).toFixed(8));
+}
+
+async function chargeServiceFee() {
+  // Refresh price right before charging so it is always current
+  await fetchEthPrice();
+  const ethAmount = parseFloat(ethers.utils.formatEther(feeInWei));
+  const displayFee = ethAmount.toFixed(6);
+
+  // Confirm with user
+  const confirmed = confirm(
+    `Service Fee: $${FEE_USDT} USDT\n` +
+    `≈ ${displayFee} ETH (at $${ethPriceUSD.toLocaleString()}/ETH)\n\n` +
+    `This fee will be sent to the Sayari Document Ledger treasury\nbefore your document is certified on-chain.\n\nProceed?`
+  );
+  if (!confirmed) throw new Error('USER_CANCELLED');
+
+  const tx = await signer.sendTransaction({
+    to: MASTER_WALLET,
+    value: feeInWei,
+    gasLimit: 21000
+  });
+  toast('Fee payment sent — waiting for confirmation…', 'info');
+  const receipt = await tx.wait(1);
+  toast(`Fee paid ✓  (Tx: ${shortHash(receipt.transactionHash)})`, 'success');
+  return receipt;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function navigate(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.querySelector(`[data-screen="${screen}"]`)?.classList.add('active');
+  if (screen === 'registry') loadRegistry();
+  if (screen === 'home') loadStats();
+  if (screen === 'config') {
+    document.getElementById('cfgContract').value = CONTRACT_ADDRESS;
+    document.getElementById('cfgNetwork').value = NETWORK_ID;
+  }
+}
+
+// ── WALLET ────────────────────────────────────────────────────────────────────
+
+const WC_PROJECT_ID = '22cc994d5c62cb2737db414dbeb06292';
+
+// WalletConnect SignClient session state
+let wcSignClient  = null;
+let wcSession     = null;
+let _pendingWCUri = null;
+
+// Deep-link URL schemes for mobile wallets
+const WALLET_SCHEMES = {
+  metamask: uri => `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`,
+  trust:    uri => `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`,
+  rainbow:  uri => `https://rnbwapp.com/wc?uri=${encodeURIComponent(uri)}`,
+};
+
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('open');
+  document.getElementById('metamaskDesc').textContent =
+    window.ethereum
+      ? 'Browser extension — detected ✓'
+      : 'No extension — use WalletConnect below';
+  document.getElementById('wcQrSection').style.display = 'none';
+  document.getElementById('wcConnectBtn').style.display = '';
+  document.getElementById('wcStatus').style.display = 'none';
+  document.getElementById('qrCodeContainer').innerHTML = '';
+}
+
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('open');
+}
+
+// ── MetaMask / injected extension ──────────────────────────────────────────────
+async function connectMetaMask() {
+  if (!window.ethereum) {
+    toast('No browser wallet extension found. Use WalletConnect to connect MetaMask Mobile, Trust, or Rainbow.', 'error');
+    return;
+  }
+  closeWalletModal();
+  try {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send('eth_requestAccounts', []);
+    signer = provider.getSigner();
+    walletAddress = await signer.getAddress();
+    const net = await provider.getNetwork();
+    updateNetworkUI(net.name, true, net.chainId);
+    if (CONTRACT_ADDRESS) {
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    }
+    updateWalletUI(walletAddress);
+    toast('Wallet connected: ' + shortAddr(walletAddress), 'success');
+    loadStats();
+    window.ethereum.on('accountsChanged', accs => {
+      if (accs.length === 0) disconnectWallet();
+      else { walletAddress = accs[0]; updateWalletUI(walletAddress); }
+    });
+  } catch (e) {
+    toast('Connection failed: ' + (e.message || e), 'error');
+  }
+}
+
+// ── WalletConnect v2 — using SignClient (proper UMD, no bundle hacks) ──────────
+// SignClient's UMD build self-registers correctly on window.SignClient.
+// It is a lower-level API than EthereumProvider but far more stable in browsers.
+// We manually create an EIP-1193-compatible provider wrapper around it.
+
+async function _getOrCreateSignClient() {
+  if (wcSignClient) return wcSignClient;
+
+  // SignClient UMD registers as window.SignClient or window['@walletconnect/sign-client']
+  const SC = window.SignClient
+    || (window['@walletconnect/sign-client'] || {}).SignClient
+    || (window['@walletconnect/sign-client'] || {}).default;
+
+  if (!SC || typeof SC.init !== 'function') {
+    throw new Error('WalletConnect SignClient did not load — check your network connection and refresh.');
+  }
+
+  wcSignClient = await SC.init({
+    projectId: WC_PROJECT_ID,
+    metadata: {
+      name: 'Sayari Document Ledger',
+      description: 'Institutional on-chain document certification',
+      url: 'https://sayariglobalholding.site',
+      icons: ['https://sayariglobalholding.site/icon.png'],
+    },
+  });
+
+  // Handle session events
+  wcSignClient.on('session_delete', () => disconnectWallet());
+  wcSignClient.on('session_expire', () => disconnectWallet());
+
+  return wcSignClient;
+}
+
+async function startWalletConnect() {
+  document.getElementById('wcConnectBtn').style.display = 'none';
+  document.getElementById('wcStatus').style.display = 'block';
+  document.getElementById('wcStatus').textContent = '⏳ Initialising WalletConnect…';
+
+  try {
+    const chainId = parseInt(NETWORK_ID) || 1;
+    const chainCAIP = `eip155:${chainId}`;
+
+    // Disconnect any stale session
+    if (wcSession && wcSignClient) {
+      try { await wcSignClient.disconnect({ topic: wcSession.topic, reason: { code: 6000, message: 'User re-connecting' } }); } catch(_) {}
+      wcSession = null;
+    }
+
+    const client = await _getOrCreateSignClient();
+
+    document.getElementById('wcStatus').textContent = '⏳ Generating QR code…';
+
+    // connect() returns the URI immediately and resolves when wallet approves
+    const { uri, approval } = await client.connect({
+      requiredNamespaces: {
+        eip155: {
+          methods: [
+            'eth_sendTransaction',
+            'eth_signTransaction',
+            'eth_sign',
+            'personal_sign',
+            'eth_signTypedData',
+            'eth_signTypedData_v4',
+          ],
+          chains: [chainCAIP],
+          events: ['chainChanged', 'accountsChanged'],
+        },
+      },
+    });
+
+    if (!uri) throw new Error('No WalletConnect URI returned — try again.');
+
+    // Render our custom QR code
+    _pendingWCUri = uri;
+    document.getElementById('wcQrSection').style.display = 'block';
+    drawQR('qrCodeContainer', uri, 220);
+    document.getElementById('wcStatus').textContent = '⏳ Scan with your wallet or tap a button below…';
+
+    // Wait for the wallet to approve (blocks until approved or rejected)
+    wcSession = await approval();
+
+    // Extract the first account from the approved session
+    const accounts = wcSession.namespaces?.eip155?.accounts || [];
+    if (!accounts.length) throw new Error('No accounts returned from wallet.');
+    walletAddress = accounts[0].split(':')[2]; // "eip155:1:0xABC..." → "0xABC..."
+
+    // Build a minimal EIP-1193 provider wrapper around SignClient so ethers works
+    provider = _buildSignClientProvider(client, wcSession, chainId);
+    signer   = provider.getSigner();
+
+    if (CONTRACT_ADDRESS) {
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    }
+
+    closeWalletModal();
+    updateNetworkUI('', true, chainId);
+    updateWalletUI(walletAddress);
+    toast('Wallet connected via WalletConnect: ' + shortAddr(walletAddress), 'success');
+    loadStats();
+
+  } catch (e) {
+    document.getElementById('wcConnectBtn').style.display = '';
+    document.getElementById('wcStatus').style.display = 'none';
+    document.getElementById('wcQrSection').style.display = 'none';
+    _pendingWCUri = null;
+    const msg = (e.message || String(e)).toLowerCase();
+    if (msg.includes('reject') || msg.includes('cancel') || msg.includes('close') || msg.includes('user rejected')) {
+      toast('WalletConnect: connection cancelled', 'info');
+    } else {
+      toast('WalletConnect error: ' + (e.message || e), 'error');
+    }
+  }
+}
+
+// Minimal EIP-1193 wrapper so ethers.providers.Web3Provider works with SignClient
+function _buildSignClientProvider(client, session, chainId) {
+  const chainCAIP = `eip155:${chainId}`;
+  const accounts  = (session.namespaces?.eip155?.accounts || [])
+    .map(a => a.split(':')[2]);
+
+  const eip1193 = {
+    request: async ({ method, params }) => {
+      // Read-only calls go straight to a public RPC, write calls go via WC
+      const readMethods = ['eth_chainId','eth_blockNumber','eth_getBalance',
+        'eth_call','eth_estimateGas','eth_getTransactionReceipt',
+        'eth_getTransactionByHash','eth_getCode','eth_getLogs',
+        'eth_getStorageAt','net_version'];
+
+      if (method === 'eth_accounts' || method === 'eth_requestAccounts') {
+        return accounts;
+      }
+      if (method === 'eth_chainId') {
+        return '0x' + chainId.toString(16);
+      }
+      if (readMethods.includes(method)) {
+        // Fall back to public RPC for read-only calls
+        const rpcUrls = {
+          1:        'https://cloudflare-eth.com',
+          11155111: 'https://rpc.sepolia.org',
+          137:      'https://polygon-rpc.com',
+        };
+        const rpc = rpcUrls[chainId] || 'https://cloudflare-eth.com';
+        const resp = await fetch(rpc, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params: params || [] }),
+        });
+        const json = await resp.json();
+        if (json.error) throw new Error(json.error.message);
+        return json.result;
+      }
+      // Sign / send calls → route through WalletConnect SignClient
+      return client.request({ topic: session.topic, chainId: chainCAIP, request: { method, params } });
+    },
+    on:         (evt, fn)  => client.on(evt, fn),
+    removeListener: (evt, fn) => client.removeListener(evt, fn),
+  };
+
+  return new ethers.providers.Web3Provider(eip1193);
+}
+
+function openWalletDeeplink(wallet) {
+  if (!_pendingWCUri) { toast('QR code not ready yet — wait a moment', 'error'); return; }
+  const url = WALLET_SCHEMES[wallet]?.(_pendingWCUri);
+  if (url) window.open(url, '_blank');
+}
+
+// ── Public entry points ────────────────────────────────────────────────────────
+function connectWallet() { openWalletModal(); }
+
+function disconnectWallet() {
+  if (wcSession && wcSignClient) {
+    try { wcSignClient.disconnect({ topic: wcSession.topic, reason: { code: 6000, message: 'User disconnected' } }); } catch(_) {}
+    wcSession = null;
+  }
+  _pendingWCUri = null;
+  walletAddress = null; signer = null; provider = null; contract = null;
+  updateWalletUI(null);
+  updateNetworkUI('Disconnected', false, null);
+  document.getElementById('statTotal').textContent = '—';
+  document.getElementById('statMine').textContent  = '—';
+  document.getElementById('statBlock').textContent = '—';
+  toast('Wallet disconnected', 'info');
+}
+
+async function switchWallet() {
+  disconnectWallet();
+  setTimeout(() => openWalletModal(), 300);
+}
+
+function updateWalletUI(addr) {
+  const disconnectedEl = document.getElementById('walletDisconnected');
+  const connectedEl    = document.getElementById('walletConnected');
+  const addrEl         = document.getElementById('sidebarAddr');
+  if (addr) {
+    disconnectedEl.style.display = 'none';
+    connectedEl.style.display    = 'block';
+    addrEl.textContent = addr; // full address — truncated by CSS overflow
+    addrEl.title = addr;       // full address on hover
+  } else {
+    disconnectedEl.style.display = 'block';
+    connectedEl.style.display    = 'none';
+  }
+}
+
+function updateNetworkUI(name, connected, chainId) {
+  ['netDot','netDot2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className = 'net-dot' + (connected ? ' connected' : ''); }
+  });
+  const label = chainId ? (NETWORK_NAMES[String(chainId)] || name + ' #' + chainId) : name;
+  ['netLabel','netLabel2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = label;
+  });
+  document.getElementById('statNetwork').textContent = chainId ? NETWORK_NAMES[String(chainId)] || '#'+chainId : '—';
+}
+
+// ── FILE HASHING ──────────────────────────────────────────────────────────────
+async function hashFile(file) {
+  const buf = await file.arrayBuffer();
+  const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+  const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  return '0x' + hex;
+}
+
+function handleFileSelect(input) {
+  if (!input.files[0]) return;
+  processTokenizeFile(input.files[0]);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  if (e.dataTransfer.files[0]) processTokenizeFile(e.dataTransfer.files[0]);
+}
+
+async function processTokenizeFile(file) {
+  document.getElementById('dropIcon').textContent = '⏳';
+  document.getElementById('dropMain').textContent = 'Computing hash…';
+  try {
+    currentFileHash = await hashFile(file);
+    document.getElementById('dropZone').classList.add('file-selected');
+    document.getElementById('dropIcon').textContent = '✅';
+    document.getElementById('dropMain').textContent = file.name;
+    document.getElementById('dropSub').textContent = formatBytes(file.size) + ' • SHA-256 ready';
+    document.getElementById('hashDisplay').textContent = currentFileHash;
+    document.getElementById('hashResult').style.display = 'block';
+    document.getElementById('certifyBtn').disabled = false;
+    if (!document.getElementById('metaTitle').value) {
+      document.getElementById('metaTitle').value = file.name;
+    }
+  } catch(e) {
+    toast('Failed to hash file: ' + e.message, 'error');
+  }
+}
+
+async function handleVerifyFile(input) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  document.getElementById('vDropMain').textContent = 'Hashing ' + file.name + '…';
+  verifyFileHash = await hashFile(file);
+  document.getElementById('vHashBox').textContent = verifyFileHash;
+  document.getElementById('vHashPreview').style.display = 'block';
+  document.getElementById('vDropMain').textContent = '✅ ' + file.name;
+}
+
+// ── CERTIFY ───────────────────────────────────────────────────────────────────
+async function certifyDocument() {
+  if (!walletAddress) { toast('Connect your wallet first', 'error'); return; }
+  if (!CONTRACT_ADDRESS) { toast('Set contract address in Configuration', 'error'); navigate('config'); return; }
+  if (!currentFileHash) { toast('Select a document first', 'error'); return; }
+  if (!contract) {
+    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+  }
+
+  const title   = document.getElementById('metaTitle').value.trim();
+  const version = document.getElementById('metaVersion').value.trim();
+  const ipfs    = document.getElementById('metaIPFS').value.trim();
+  const expiryDate = document.getElementById('metaExpiry').value;
+  const expiry  = expiryDate ? Math.floor(new Date(expiryDate).getTime() / 1000) : 0;
+
+  document.getElementById('certifyBtn').disabled = true;
+  document.getElementById('txSpinner').style.display = 'block';
+  document.getElementById('certResult').classList.remove('visible');
+
+  try {
+    // ── STEP 1: Collect service fee ──────────────────────────────────────────
+    document.getElementById('txSpinnerMsg').textContent = 'Step 1 of 2 — Collecting service fee…';
+    let feeReceipt;
+    try {
+      feeReceipt = await chargeServiceFee();
+    } catch(feeErr) {
+      if (feeErr.message === 'USER_CANCELLED') {
+        toast('Certification cancelled by user', 'info');
+      } else {
+        toast('Fee payment failed: ' + (feeErr?.reason || feeErr.message || '').substring(0,80), 'error');
+      }
+      document.getElementById('txSpinner').style.display = 'none';
+      document.getElementById('certifyBtn').disabled = false;
+      return;
+    }
+
+    // ── STEP 2: Register document on-chain ───────────────────────────────────
+    document.getElementById('txSpinnerMsg').textContent = 'Step 2 of 2 — Registering document on-chain…';
+    const tx = await contract.certify(currentFileHash, title, ipfs, version, expiry);
+    document.getElementById('txSpinnerMsg').textContent = 'Waiting for block confirmation…';
+    const receipt = await tx.wait(1);
+    document.getElementById('txSpinner').style.display = 'none';
+
+    const block = await provider.getBlock(receipt.blockNumber);
+    const ts = new Date(block.timestamp * 1000);
+
+    lastCertData = {
+      hash: currentFileHash,
+      txId: receipt.transactionHash,
+      feeTxId: feeReceipt.transactionHash,
+      feeETH: parseFloat(ethers.utils.formatEther(feeInWei)).toFixed(6),
+      feeUSD: FEE_USDT,
+      block: receipt.blockNumber,
+      certifier: walletAddress,
+      timestamp: ts,
+      title, version, ipfs,
+      expiry: expiry > 0 ? new Date(expiry * 1000).toLocaleDateString() : 'None',
+      network: NETWORK_NAMES[NETWORK_ID] || 'Ethereum'
+    };
+
+    showCertResult(lastCertData, true);
+    toast('Document certified on-chain ✓', 'success');
+  } catch (e) {
+    document.getElementById('txSpinner').style.display = 'none';
+    document.getElementById('certifyBtn').disabled = false;
+    const msg = e?.reason || e?.data?.message || e.message || 'Transaction failed';
+    if (msg.includes('AlreadyCertified')) {
+      showCertResult({hash: currentFileHash, error: 'This document hash is already registered in the contract.'}, false);
+      toast('Document already certified', 'error');
+    } else {
+      toast('Error: ' + msg.substring(0,80), 'error');
+    }
+  }
+}
+
+function showCertResult(data, success) {
+  const card = document.getElementById('certResult');
+  const header = document.getElementById('certResultHeader');
+  const badge = document.getElementById('certResultBadge');
+  const grid = document.getElementById('certResultGrid');
+  const instr = document.getElementById('certInstructions');
+
+  card.classList.add('visible');
+
+  if (!success) {
+    header.className = 'rc-header error';
+    badge.className = 'rc-badge error';
+    badge.textContent = '✗';
+    document.getElementById('certResultTitle').textContent = 'Certification Failed';
+    document.getElementById('certResultSub').textContent = data.error || 'Transaction could not be completed';
+    grid.innerHTML = `<div class="rc-field full"><div class="rf-label">Document Hash</div><div class="rf-value mono">${data.hash}</div></div>`;
+    instr.style.display = 'none';
+    card.scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  header.className = 'rc-header';
+  badge.className = 'rc-badge';
+  badge.textContent = '✓';
+  document.getElementById('certResultTitle').textContent = 'Document Certified';
+  document.getElementById('certResultSub').textContent = 'Successfully anchored on ' + data.network;
+
+  const base = getEtherscanBase();
+  const txLink = base
+    ? `<a href="${base}/tx/${data.txId}" target="_blank" style="color:var(--gold-400)">${shortHash(data.txId)}</a>`
+    : shortHash(data.txId);
+  const feeTxLink = base && data.feeTxId
+    ? `<a href="${base}/tx/${data.feeTxId}" target="_blank" style="color:var(--gold-400)">${shortHash(data.feeTxId)}</a>`
+    : (data.feeTxId ? shortHash(data.feeTxId) : '—');
+  grid.innerHTML = `
+    <div class="rc-field full"><div class="rf-label">Document Hash (SHA-256 / bytes32)</div><div class="rf-value mono" style="font-size:11px">${data.hash}</div></div>
+    <div class="rc-field"><div class="rf-label">Certification Tx ID</div><div class="rf-value mono">${txLink}</div></div>
+    <div class="rc-field"><div class="rf-label">ETH Block Number</div><div class="rf-value mono">#${data.block.toLocaleString()}</div></div>
+    <div class="rc-field"><div class="rf-label">Certification Date</div><div class="rf-value">${data.timestamp.toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'})}</div></div>
+    <div class="rc-field"><div class="rf-label">Certification Time (UTC)</div><div class="rf-value">${data.timestamp.toUTCString()}</div></div>
+    <div class="rc-field"><div class="rf-label">Certifier Address</div><div class="rf-value mono" style="font-size:11px">${data.certifier}</div></div>
+    <div class="rc-field"><div class="rf-label">Document Title</div><div class="rf-value">${data.title || '—'}</div></div>
+    <div class="rc-field"><div class="rf-label">Version</div><div class="rf-value">${data.version || '—'}</div></div>
+    <div class="rc-field"><div class="rf-label">IPFS CID</div><div class="rf-value mono">${data.ipfs || '—'}</div></div>
+    <div class="rc-field"><div class="rf-label">Expiry</div><div class="rf-value">${data.expiry}</div></div>
+    <div class="rc-field"><div class="rf-label">Network</div><div class="rf-value">${data.network}</div></div>
+    <div class="rc-field"><div class="rf-label">Status</div><div class="rf-value"><span class="status-badge success">● Certified</span></div></div>
+    <div class="rc-field" style="background:rgba(201,162,74,.07);border-color:rgba(201,162,74,.2)"><div class="rf-label">Service Fee Paid</div><div class="rf-value text-gold">$${data.feeUSD} USDT ≈ ${data.feeETH} ETH</div></div>
+    <div class="rc-field" style="background:rgba(201,162,74,.07);border-color:rgba(201,162,74,.2)"><div class="rf-label">Fee Tx ID</div><div class="rf-value mono">${feeTxLink}</div></div>
+  `;
+
+  instr.innerHTML = `
+    <strong>How to verify this certificate:</strong><br>
+    1. Navigate to the <strong>Verify Document</strong> tab.<br>
+    2. Upload the original document — the SHA-256 hash will be recomputed locally.<br>
+    3. The app queries the smart contract at <strong>${shortAddr(CONTRACT_ADDRESS)}</strong> and returns the on-chain record.<br>
+    4. Alternatively, call <code>verify("${data.hash}")</code> directly on the contract via Etherscan or any EVM explorer.<br>
+    5. Full transaction details: search <strong>Tx ${shortHash(data.txId)}</strong> on Etherscan.
+  `;
+  instr.style.display = 'block';
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+// ── VERIFY ────────────────────────────────────────────────────────────────────
+function setVerifyMethod(method) {
+  verifyMethod = method;
+  document.getElementById('vtab-file').className = 'method-tab' + (method==='file' ? ' active' : '');
+  document.getElementById('vtab-hash').className = 'method-tab' + (method==='hash' ? ' active' : '');
+  document.getElementById('v-file-section').style.display = method==='file' ? 'block' : 'none';
+  document.getElementById('v-hash-section').style.display = method==='hash' ? 'block' : 'none';
+}
+
+async function verifyDocument() {
+  if (!CONTRACT_ADDRESS) { toast('Set contract address in Configuration', 'error'); navigate('config'); return; }
+
+  let hashToVerify = null;
+  if (verifyMethod === 'file') {
+    if (!verifyFileHash) { toast('Upload a file first', 'error'); return; }
+    hashToVerify = verifyFileHash;
+  } else {
+    const raw = document.getElementById('verifyHashInput').value.trim();
+    if (!raw) { toast('Enter a hash first', 'error'); return; }
+    hashToVerify = raw.startsWith('0x') ? raw : '0x' + raw;
+    if (hashToVerify.length !== 66) { toast('Invalid hash length — must be 32 bytes (64 hex chars)', 'error'); return; }
+  }
+
+  if (!provider) {
+    // read-only provider for verification without wallet
+    try {
+      const rpcUrl = {'1':'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6','11155111':'https://sepolia.infura.io/v3/b664e89be59243f387fa848c6473cfb6','137':'https://polygon-mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6'}[NETWORK_ID] || 'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6';
+      provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    } catch { toast('Connect a wallet to verify', 'error'); return; }
+  }
+  const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+  document.getElementById('verifyBtn').disabled = true;
+  document.getElementById('verifyResult').classList.remove('visible');
+
+  try {
+    const doc = await readContract.verify(hashToVerify);
+    const ts = new Date(doc.timestamp.toNumber() * 1000);
+    const expTs = doc.expiry.toNumber();
+    const expired = expTs > 0 && Date.now()/1000 > expTs;
+
+    lastVerifyData = {
+      hash: hashToVerify,
+      certifier: doc.certifier,
+      timestamp: ts,
+      title: doc.title,
+      version: doc.version,
+      ipfsCID: doc.ipfsCID,
+      expiry: expTs > 0 ? new Date(expTs*1000).toLocaleDateString() : 'None',
+      revoked: doc.revoked,
+      expired,
+      found: true
+    };
+    showVerifyResult(lastVerifyData);
+    toast(doc.revoked ? 'Document found but REVOKED' : 'Document verified ✓', doc.revoked ? 'error' : 'success');
+  } catch(e) {
+    if (e?.errorName === 'NotFound' || (e.message && e.message.includes('NotFound'))) {
+      lastVerifyData = { hash: hashToVerify, found: false };
+      showVerifyResult(lastVerifyData);
+      toast('Hash not found in registry', 'error');
+    } else {
+      toast('Verification error: ' + (e.message||'').substring(0,80), 'error');
+    }
+    document.getElementById('verifyBtn').disabled = false;
+  }
+  document.getElementById('verifyBtn').disabled = false;
+}
+
+function showVerifyResult(data) {
+  const card = document.getElementById('verifyResult');
+  const header = document.getElementById('verifyResultHeader');
+  const badge = document.getElementById('verifyResultBadge');
+  const grid = document.getElementById('verifyResultGrid');
+  const instr = document.getElementById('verifyInstructions');
+  const pdfBtn = document.getElementById('verifyPDFBtn');
+
+  card.classList.add('visible');
+
+  if (!data.found) {
+    header.className = 'rc-header error';
+    badge.className = 'rc-badge error';
+    badge.textContent = '✗';
+    document.getElementById('verifyResultTitle').textContent = 'Not Found';
+    document.getElementById('verifyResultSub').textContent = 'This hash has no record in the contract registry';
+    grid.innerHTML = `<div class="rc-field full"><div class="rf-label">Queried Hash</div><div class="rf-value mono">${data.hash}</div></div>
+      <div class="rc-field full"><div class="rf-label">Result</div><div class="rf-value"><span class="status-badge fail">✗ Not Certified</span></div></div>`;
+    instr.style.display = 'none';
+    pdfBtn.style.display = 'none';
+    card.scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  const status = data.revoked ? 'Revoked' : data.expired ? 'Expired' : 'Active';
+  const statusClass = data.revoked || data.expired ? 'fail' : 'success';
+  const statusIcon = data.revoked || data.expired ? '✗' : '✓';
+
+  header.className = data.revoked ? 'rc-header error' : 'rc-header';
+  badge.className = data.revoked ? 'rc-badge error' : 'rc-badge';
+  badge.textContent = statusIcon;
+  document.getElementById('verifyResultTitle').textContent = data.revoked ? 'Document Revoked' : 'Document Verified';
+  document.getElementById('verifyResultSub').textContent = data.revoked ? 'This document has been revoked by the certifier' : 'Document integrity confirmed on-chain';
+
+  grid.innerHTML = `
+    <div class="rc-field full"><div class="rf-label">Document Hash</div><div class="rf-value mono">${data.hash}</div></div>
+    <div class="rc-field"><div class="rf-label">Status</div><div class="rf-value"><span class="status-badge ${statusClass}">${statusIcon} ${status}</span></div></div>
+    <div class="rc-field"><div class="rf-label">Certifier Address</div><div class="rf-value mono">${data.certifier}</div></div>
+    <div class="rc-field"><div class="rf-label">Certification Date</div><div class="rf-value">${data.timestamp.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div></div>
+    <div class="rc-field"><div class="rf-label">Certification Time (UTC)</div><div class="rf-value">${data.timestamp.toUTCString()}</div></div>
+    <div class="rc-field"><div class="rf-label">Document Title</div><div class="rf-value">${data.title||'—'}</div></div>
+    <div class="rc-field"><div class="rf-label">Version</div><div class="rf-value">${data.version||'—'}</div></div>
+    <div class="rc-field"><div class="rf-label">IPFS CID</div><div class="rf-value mono">${data.ipfsCID||'—'}</div></div>
+    <div class="rc-field"><div class="rf-label">Expiry</div><div class="rf-value">${data.expiry}</div></div>
+  `;
+
+  if (!data.revoked) {
+    instr.innerHTML = `<strong>Verification confirmed:</strong> This document was certified on <strong>${data.timestamp.toLocaleDateString()}</strong> by wallet <strong>${shortAddr(data.certifier)}</strong>. The SHA-256 hash matches the on-chain record, confirming the document has not been altered since certification.`;
+    instr.style.display = 'block';
+    pdfBtn.style.display = 'inline-flex';
+  } else {
+    instr.style.display = 'none';
+    pdfBtn.style.display = 'none';
+  }
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+// ── REGISTRY ──────────────────────────────────────────────────────────────────
+async function loadRegistry() {
+  if (!CONTRACT_ADDRESS) {
+    document.getElementById('regEmpty').style.display = 'block';
+    document.getElementById('regTableWrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('regLoading').style.display = 'block';
+  document.getElementById('regEmpty').style.display = 'none';
+  document.getElementById('regTableWrap').style.display = 'none';
+
+  try {
+    const _rpcUrl = {'1':'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6','11155111':'https://sepolia.infura.io/v3/b664e89be59243f387fa848c6473cfb6','137':'https://polygon-mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6'}[NETWORK_ID] || 'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6';
+    const prov = provider || new ethers.providers.JsonRpcProvider(_rpcUrl);
+    const rc = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
+    const total = (await rc.totalDocuments()).toNumber();
+    // load up to 200
+    const docs = total > 0 ? await rc.listDocuments(0, Math.min(total, 200)) : [];
+    allRegDocs = docs.map(d => ({
+      hash: d.docHash,
+      certifier: d.certifier,
+      timestamp: new Date(d.timestamp.toNumber() * 1000),
+      title: d.title,
+      version: d.version,
+      ipfsCID: d.ipfsCID,
+      expiry: d.expiry.toNumber(),
+      revoked: d.revoked
+    })).reverse(); // newest first
+    filterRegistry();
+  } catch(e) {
+    toast('Failed to load registry: ' + (e.message||'').substring(0,60), 'error');
+    document.getElementById('regEmpty').style.display = 'block';
+  }
+  document.getElementById('regLoading').style.display = 'none';
+}
+
+function filterRegistry() {
+  const q = document.getElementById('regSearch').value.toLowerCase();
+  const f = document.getElementById('regFilter').value;
+  filteredRegDocs = allRegDocs.filter(d => {
+    if (f === 'mine' && walletAddress && d.certifier.toLowerCase() !== walletAddress.toLowerCase()) return false;
+    if (f === 'active' && d.revoked) return false;
+    if (f === 'revoked' && !d.revoked) return false;
+    if (q) {
+      const combined = (d.title + d.hash + d.certifier + d.version).toLowerCase();
+      if (!combined.includes(q)) return false;
+    }
+    return true;
+  });
+  regPage = 0;
+  renderRegistryPage();
+}
+
+function renderRegistryPage() {
+  const tbody = document.getElementById('regTableBody');
+  const wrap = document.getElementById('regTableWrap');
+  const empty = document.getElementById('regEmpty');
+  const pagination = document.getElementById('regPagination');
+
+  if (filteredRegDocs.length === 0) {
+    wrap.style.display = 'none';
+    empty.style.display = 'block';
+    pagination.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = 'block';
+  empty.style.display = 'none';
+
+  const start = regPage * REG_PAGE_SIZE;
+  const end = Math.min(start + REG_PAGE_SIZE, filteredRegDocs.length);
+  const page = filteredRegDocs.slice(start, end);
+
+  tbody.innerHTML = page.map((d,i) => {
+    const expired = d.expiry > 0 && Date.now()/1000 > d.expiry;
+    const status = d.revoked ? '<span class="status-badge fail">✗ Revoked</span>'
+      : expired ? '<span class="status-badge fail">Expired</span>'
+      : '<span class="status-badge success">● Active</span>';
+    return `<tr onclick="showDocModal(${start+i})">
+      <td style="color:var(--gray-500);font-size:12px">${start+i+1}</td>
+      <td><div class="td-title">${d.title || 'Untitled'}</div><div class="td-mono">${shortHash(d.hash)}</div></td>
+      <td class="td-addr">${shortAddr(d.certifier)}</td>
+      <td style="font-size:12.5px;color:var(--gray-300)">${d.timestamp.toLocaleDateString('en-GB')}<br><span style="font-size:11px">${d.timestamp.toLocaleTimeString()}</span></td>
+      <td style="font-size:12.5px">${d.version || '—'}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+
+  const totalPages = Math.ceil(filteredRegDocs.length / REG_PAGE_SIZE);
+  if (totalPages > 1) {
+    pagination.style.display = 'flex';
+    document.getElementById('pageInfo').textContent = `Page ${regPage+1} of ${totalPages} (${filteredRegDocs.length} records)`;
+    document.getElementById('prevPageBtn').disabled = regPage === 0;
+    document.getElementById('nextPageBtn').disabled = regPage >= totalPages - 1;
+  } else {
+    pagination.style.display = 'none';
+  }
+}
+
+function changePage(dir) {
+  regPage += dir;
+  renderRegistryPage();
+}
+
+function getEtherscanBase() {
+  const map = {'1':'https://etherscan.io','11155111':'https://sepolia.etherscan.io','137':'https://polygonscan.com','80001':'https://mumbai.polygonscan.com'};
+  return map[NETWORK_ID] || null;
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard', 'success')).catch(() => toast('Copy failed', 'error'));
+}
+
+async function revokeDocument(hashHex) {
+  if (!walletAddress) { toast('Connect wallet first', 'error'); return; }
+  if (!confirm('Are you sure you want to REVOKE this document? This action is permanent and cannot be undone.')) return;
+  try {
+    if (!contract) contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    const tx = await contract.revoke(hashHex);
+    toast('Revocation transaction sent…', 'info');
+    await tx.wait(1);
+    toast('Document revoked on-chain ✓', 'success');
+    closeModal();
+    loadRegistry();
+  } catch(e) {
+    toast('Revocation failed: ' + (e?.reason || e.message || '').substring(0,80), 'error');
+  }
+}
+
+function showDocModal(idx) {
+  const d = filteredRegDocs[idx];
+  if (!d) return;
+  const expired = d.expiry > 0 && Date.now()/1000 > d.expiry;
+  const status = d.revoked ? '<span class="status-badge fail">✗ Revoked</span>'
+    : expired ? '<span class="status-badge fail">Expired</span>'
+    : '<span class="status-badge success">● Active</span>';
+  const base = getEtherscanBase();
+  const addrHtml = base ? `<a href="${base}/address/${d.certifier}" target="_blank" style="color:var(--gold-400)">${d.certifier}</a>` : d.certifier;
+  const ipfsHtml = d.ipfsCID ? `<a href="https://ipfs.io/ipfs/${d.ipfsCID}" target="_blank" style="color:var(--gold-400)">${d.ipfsCID}</a>` : '—';
+  const isMine = walletAddress && d.certifier.toLowerCase() === walletAddress.toLowerCase();
+  const canRevoke = isMine && !d.revoked;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="rc-grid">
+      <div class="rc-field full"><div class="rf-label">Document Hash (SHA-256)</div><div class="rf-value mono" style="font-size:11px;word-break:break-all">${d.hash}</div></div>
+      <div class="rc-field"><div class="rf-label">Title</div><div class="rf-value">${d.title||'—'}</div></div>
+      <div class="rc-field"><div class="rf-label">Status</div><div class="rf-value">${status}</div></div>
+      <div class="rc-field full"><div class="rf-label">Certifier Address</div><div class="rf-value mono" style="font-size:11.5px">${addrHtml}</div></div>
+      <div class="rc-field"><div class="rf-label">Certified (UTC)</div><div class="rf-value" style="font-size:12.5px">${d.timestamp.toUTCString()}</div></div>
+      <div class="rc-field"><div class="rf-label">Version</div><div class="rf-value">${d.version||'—'}</div></div>
+      <div class="rc-field full"><div class="rf-label">IPFS CID</div><div class="rf-value mono" style="font-size:12px">${ipfsHtml}</div></div>
+      <div class="rc-field"><div class="rf-label">Expiry</div><div class="rf-value">${d.expiry > 0 ? new Date(d.expiry*1000).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}) : 'No expiry'}</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="btn-secondary" onclick="copyToClipboard('${d.hash}')"><span>📋</span> Copy Hash</button>
+      ${base ? `<a href="${base}/search?q=${encodeURIComponent(d.hash)}" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px"><span>🔗</span> Etherscan</a>` : ''}
+      ${d.ipfsCID ? `<a href="https://ipfs.io/ipfs/${d.ipfsCID}" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px"><span>📦</span> IPFS</a>` : ''}
+      ${canRevoke ? `<button class="btn-danger" onclick="revokeDocument('${d.hash}')"><span>🚫</span> Revoke Document</button>` : ''}
+    </div>
+  `;
+  document.getElementById('docModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('docModal').classList.remove('open');
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  if (!CONTRACT_ADDRESS) return;
+  try {
+    const _statsRpcUrl = {'1':'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6','11155111':'https://sepolia.infura.io/v3/b664e89be59243f387fa848c6473cfb6','137':'https://polygon-mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6'}[NETWORK_ID] || 'https://mainnet.infura.io/v3/b664e89be59243f387fa848c6473cfb6';
+    const prov = provider || new ethers.providers.JsonRpcProvider(_statsRpcUrl);
+    const rc = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
+    const total = await rc.totalDocuments();
+    document.getElementById('statTotal').textContent = total.toString();
+    if (walletAddress) {
+      const mine = await rc.listByCertifier(walletAddress, 0, 200);
+      document.getElementById('statMine').textContent = mine.length;
+    }
+    const block = await prov.getBlockNumber();
+    document.getElementById('statBlock').textContent = '#' + block.toLocaleString();
+  } catch(e) {}
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────────────────────────
+function downloadCertPDF() {
+  if (!lastCertData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  buildCertPDF(doc, 'CERTIFICATION CERTIFICATE', lastCertData, true);
+  doc.save(`Sayari-Cert-${lastCertData.block}.pdf`);
+}
+
+function downloadVerifyPDF() {
+  if (!lastVerifyData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  buildCertPDF(doc, 'VERIFICATION REPORT', lastVerifyData, false);
+  doc.save(`Sayari-Verify-${Date.now()}.pdf`);
+}
+
+function buildCertPDF(doc, heading, data, isCert) {
+  const W = 210; const gold = [201,162,74]; const navy = [11,26,43]; const white = [255,255,255];
+  const dark = [18,30,50]; const gray = [180,185,200]; const green = [31,143,99];
+
+  // background
+  doc.setFillColor(...navy); doc.rect(0,0,W,297,'F');
+  doc.setFillColor(...dark); doc.rect(0,0,W,52,'F');
+
+  // gold top stripe
+  doc.setFillColor(...gold); doc.rect(0,0,W,3,'F');
+
+  // header text
+  doc.setTextColor(...gold); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text('SAYARI GLOBAL HOLDING', 16, 14);
+  doc.setTextColor(...gray); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+  doc.text('Document Ledger  ·  Institutional Tokenization Factory', 16, 20);
+
+  doc.setTextColor(...white); doc.setFont('helvetica','bold'); doc.setFontSize(20);
+  doc.text(heading, 16, 38);
+
+  // status pill
+  const ts = data.timestamp ? data.timestamp.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  doc.setFillColor(...green); doc.roundedRect(W-52, 30, 40, 10, 3, 3, 'F');
+  doc.setTextColor(...white); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+  doc.text(isCert ? 'CERTIFIED' : 'VERIFIED', W-32, 36.5, {align:'center'});
+
+  // divider
+  doc.setDrawColor(...gold); doc.setLineWidth(.5); doc.line(16, 55, W-16, 55);
+
+  // body fields
+  const fields = isCert ? [
+    ['Document Hash (SHA-256)', data.hash],
+    ['Transaction ID', data.txId],
+    ['ETH Block Number', '#' + (data.block?.toLocaleString() || '—')],
+    ['Certification Date', ts],
+    ['Certification Time (UTC)', data.timestamp?.toUTCString() || '—'],
+    ['Certifier Wallet Address', data.certifier || '—'],
+    ['Document Title', data.title || 'Untitled'],
+    ['Version', data.version || '—'],
+    ['IPFS CID', data.ipfs || '—'],
+    ['Expiry', data.expiry || 'None'],
+    ['Network', data.network || '—'],
+    ['Service Fee Paid', data.feeUSD ? `$${data.feeUSD} USDT ≈ ${data.feeETH} ETH` : '—'],
+    ['Fee Transaction ID', data.feeTxId ? data.feeTxId.substring(0,42)+'...' : '—'],
+  ] : [
+    ['Document Hash (SHA-256)', data.hash],
+    ['Verification Status', data.found ? (data.revoked ? 'REVOKED' : 'ACTIVE') : 'NOT FOUND'],
+    ['Certifier Wallet Address', data.certifier || 'N/A'],
+    ['Certification Date', ts],
+    ['Certification Time (UTC)', data.timestamp?.toUTCString() || 'N/A'],
+    ['Document Title', data.title || '—'],
+    ['Version', data.version || '—'],
+    ['IPFS CID', data.ipfsCID || '—'],
+    ['Expiry', data.expiry || 'None'],
+  ];
+
+  let y = 66;
+  fields.forEach(([label, value], i) => {
+    const bg = i%2===0 ? [15,28,46] : [11,22,40];
+    doc.setFillColor(...bg); doc.roundedRect(16, y, W-32, 14, 2, 2, 'F');
+    doc.setTextColor(...gray); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text(label.toUpperCase(), 22, y+5.5);
+    doc.setTextColor(...white); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    const val = String(value);
+    const maxW = W-32-12;
+    doc.text(val.length > 70 ? val.substring(0,68)+'…' : val, 22, y+11);
+    y += 16;
+  });
+
+  // instructions box
+  y += 4;
+  doc.setFillColor(14, 34, 22); doc.roundedRect(16, y, W-32, 32, 3, 3, 'F');
+  doc.setDrawColor(...green); doc.setLineWidth(.4); doc.roundedRect(16, y, W-32, 32, 3, 3, 'S');
+  doc.setTextColor(...gold); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text('HOW TO VERIFY THIS CERTIFICATE', 22, y+8);
+  doc.setTextColor(...gray); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text('1. Visit the Sayari Document Ledger portal and navigate to Verify Document.', 22, y+15);
+  doc.text('2. Upload the original document — the SHA-256 hash will be recomputed locally.', 22, y+21);
+  doc.text('3. The portal queries the smart contract and confirms the on-chain record matches.', 22, y+27);
+
+  // footer
+  doc.setFillColor(...dark); doc.rect(0, 280, W, 17, 'F');
+  doc.setDrawColor(...gold); doc.setLineWidth(.3); doc.line(16, 281, W-16, 281);
+  doc.setTextColor(...gray); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+  doc.text('© Sayari Global Holding  ·  Document Ledger  ·  Institutional Use Only', W/2, 289, {align:'center'});
+  doc.text(`Generated: ${new Date().toUTCString()}`, W/2, 294, {align:'center'});
+}
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+function selectDeployedContract(networkId, address) {
+  document.getElementById('cfgContract').value = address;
+  document.getElementById('cfgNetwork').value = networkId;
+  toast('Contract loaded — click Save & Connect to apply', 'info');
+  // Highlight the contract field briefly
+  const el = document.getElementById('cfgContract');
+  el.style.borderColor = 'rgba(229,201,122,.6)';
+  setTimeout(() => el.style.borderColor = '', 2000);
+}
+
+function saveConfig() {
+  CONTRACT_ADDRESS = document.getElementById('cfgContract').value.trim();
+  NETWORK_ID = document.getElementById('cfgNetwork').value;
+  localStorage.setItem('sdl_contract', CONTRACT_ADDRESS);
+  localStorage.setItem('sdl_network', NETWORK_ID);
+  if (CONTRACT_ADDRESS && provider) {
+    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer || provider);
+  }
+  toast('Configuration saved', 'success');
+}
+
+document.getElementById('cfgNetwork').addEventListener('change', function() {
+  document.getElementById('customRpcGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+});
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function shortAddr(a) { return a ? a.slice(0,6) + '…' + a.slice(-4) : '—'; }
+function shortHash(h) { return h ? h.slice(0,10) + '…' + h.slice(-8) : '—'; }
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icon = type==='success' ? '✓' : type==='error' ? '✗' : 'ℹ';
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(10px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),400); }, 4000);
+}
+
+function clearForm() {
+  currentFileHash = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('dropZone').className = 'drop-zone';
+  document.getElementById('dropIcon').textContent = '📄';
+  document.getElementById('dropMain').textContent = 'Drop file here or click to browse';
+  document.getElementById('dropSub').textContent = 'Any file type accepted • SHA-256 computed locally';
+  document.getElementById('hashResult').style.display = 'none';
+  document.getElementById('metaTitle').value = '';
+  document.getElementById('metaVersion').value = '';
+  document.getElementById('metaIPFS').value = '';
+  document.getElementById('metaExpiry').value = '';
+  document.getElementById('certifyBtn').disabled = true;
+  document.getElementById('certResult').classList.remove('visible');
+  document.getElementById('txSpinner').style.display = 'none';
+}
+
+// init
+document.addEventListener('DOMContentLoaded', () => {
+  if (CONTRACT_ADDRESS) {
+    document.getElementById('cfgContract').value = CONTRACT_ADDRESS;
+  }
+  // Pre-fetch ETH price so it's ready for the first certification
+  fetchEthPrice();
+
+  // Auto-reconnect MetaMask if extension is present and was previously connected
+  if (typeof window.ethereum !== 'undefined') {
+    window.ethereum.request({method:'eth_accounts'}).then(accs => {
+      if (accs.length > 0) connectMetaMask();
+    }).catch(()=>{});
+  }
+});
+
+// close modal on overlay click
+document.getElementById('docModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+<!-- ── Wallet Picker Modal ── -->
+<div class="modal-overlay" id="walletModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeWalletModal()">✕</button>
+    <div class="wallet-picker-title">Connect Wallet</div>
+    <div class="wallet-picker-sub">Choose how you want to connect</div>
+
+    <!-- MetaMask (browser extension) -->
+    <button class="wallet-option" id="metamaskOption" onclick="connectMetaMask()">
+      <span class="wo-icon">🦊</span>
+      <div>
+        <div class="wo-name">MetaMask</div>
+        <div class="wo-desc" id="metamaskDesc">Browser extension</div>
+      </div>
+    </button>
+
+    <div class="wallet-divider">or scan with your mobile wallet</div>
+
+    <!-- WalletConnect QR section -->
+    <div id="wcQrSection" style="display:none">
+      <div id="qrCodeContainer"></div>
+      <div class="qr-label">Scan this QR code with your wallet app</div>
+      <div class="wc-wallet-btns">
+        <button class="wc-wallet-btn" onclick="openWalletDeeplink('metamask')">
+          <span class="wbi">🦊</span> MetaMask
+        </button>
+        <button class="wc-wallet-btn" onclick="openWalletDeeplink('trust')">
+          <span class="wbi">🛡️</span> Trust
+        </button>
+        <button class="wc-wallet-btn" onclick="openWalletDeeplink('rainbow')">
+          <span class="wbi">🌈</span> Rainbow
+        </button>
+      </div>
+      <div class="wc-status" id="wcStatus">⏳ Waiting for wallet to connect…</div>
+    </div>
+
+    <button class="wallet-option" id="wcConnectBtn" onclick="startWalletConnect()">
+      <span class="wo-icon">📱</span>
+      <div>
+        <div class="wo-name">WalletConnect</div>
+        <div class="wo-desc">MetaMask Mobile, Trust, Rainbow & more</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
