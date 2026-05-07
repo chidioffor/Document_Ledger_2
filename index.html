@@ -776,11 +776,12 @@ a{color:inherit;text-decoration:none}
   overflow-y:auto;
 }
 .brand{display:flex;align-items:center;gap:14px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:24px}
-.brand-icon{
-  width:44px;height:44px;border-radius:12px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--gold-400),var(--gold-500));
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;box-shadow:var(--shadow-gold);
+.brand-logo{
+  width:46px;height:46px;border-radius:12px;flex-shrink:0;
+  object-fit:cover;object-position:center;
+  border:1px solid rgba(229,201,122,.35);
+  box-shadow:var(--shadow-gold);
+  background:rgba(255,255,255,.04);
 }
 .brand-text .name{font-family:var(--font-display);font-size:15px;font-weight:700;line-height:1.1}
 .brand-text .sub{color:var(--gray-300);font-size:11px;margin-top:3px;letter-spacing:.08em}
@@ -1159,7 +1160,7 @@ tbody td{padding:13px 16px;font-size:13.5px;vertical-align:middle}
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">⬡</div>
+      <img class="brand-logo" src="assets/sayari-global-holding-logo.jpg" alt="Sayari Global Holding logo">
       <div class="brand-text">
         <div class="name">Sayari Ledger</div>
         <div class="sub">Document Tokenization</div>
@@ -1731,7 +1732,16 @@ async function chargeServiceFee() {
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
+function ensureWalletConnectedForTokenize() {
+  if (walletAddress && signer) return true;
+  alert('No wallet connected. Please connect your wallet to continue.');
+  openWalletModal();
+  return false;
+}
+
 function navigate(screen) {
+  if (screen === 'tokenize' && !ensureWalletConnectedForTokenize()) return;
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
@@ -1762,12 +1772,6 @@ const WALLET_SCHEMES = {
 
 function openWalletModal() {
   document.getElementById('walletModal').classList.add('open');
-  document.getElementById('metamaskDesc').textContent =
-    window.ethereum
-      ? 'Browser extension — detected ✓'
-      : 'No extension — use WalletConnect below';
-  document.getElementById('metamaskOption').style.display = '';
-  document.getElementById('walletDivider').style.display = '';
   document.getElementById('wcQrSection').style.display = 'none';
   document.getElementById('wcConnectBtn').style.display = '';
   document.getElementById('wcStatus').style.display = 'none';
@@ -1779,32 +1783,78 @@ function closeWalletModal() {
 }
 
 // ── MetaMask / injected extension ──────────────────────────────────────────────
+let _mmAccountsListener = null; // track listener so we never double-register
+
 async function connectMetaMask() {
   if (!window.ethereum) {
     toast('No browser wallet extension found. Use WalletConnect to connect MetaMask Mobile, Trust, or Rainbow.', 'error');
     return;
   }
-  closeWalletModal();
   try {
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send('eth_requestAccounts', []);
+    // 1. Request accounts FIRST — this triggers the MetaMask popup.
+    //    If the user rejects, we catch here before touching anything else.
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) throw new Error('No accounts returned.');
+
+    // 2. Only close the modal after we have accounts — clean UX on rejection.
+    closeWalletModal();
+
+    // 3. Build provider. Pass the detected chainId explicitly to avoid the
+    //    async getNetwork() call that can deadlock with SignClient's Promise shim.
+    const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+    const chainId = parseInt(chainIdHex, 16);
+    provider = new ethers.providers.Web3Provider(window.ethereum, chainId);
+
     signer = provider.getSigner();
-    walletAddress = await signer.getAddress();
-    const net = await provider.getNetwork();
-    updateNetworkUI(net.name, true, net.chainId);
+    walletAddress = ethers.utils.getAddress(accounts[0]);
+
+    updateNetworkUI('', true, chainId);
     if (CONTRACT_ADDRESS) {
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     }
     updateWalletUI(walletAddress);
     toast('Wallet connected: ' + shortAddr(walletAddress), 'success');
     loadStats();
-    window.ethereum.on('accountsChanged', accs => {
-      if (accs.length === 0) disconnectWallet();
-      else { walletAddress = accs[0]; updateWalletUI(walletAddress); }
-    });
+
+    // 4. Register accountsChanged exactly once — remove previous listener first.
+    if (_mmAccountsListener) {
+      window.ethereum.removeListener('accountsChanged', _mmAccountsListener);
+    }
+    _mmAccountsListener = (accs) => {
+      if (!accs || accs.length === 0) {
+        disconnectWallet();
+      } else {
+        walletAddress = ethers.utils.getAddress(accs[0]);
+        updateWalletUI(walletAddress);
+      }
+    };
+    window.ethereum.on('accountsChanged', _mmAccountsListener);
+
+    // 5. Also handle chain changes — rebuild provider so reads stay correct.
+    window.ethereum.removeListener('chainChanged', _onChainChanged);
+    window.ethereum.on('chainChanged', _onChainChanged);
+
   } catch (e) {
-    toast('Connection failed: ' + (e.message || e), 'error');
+    const msg = e.message || String(e);
+    // User rejected (code 4001) — don't show an error toast, just leave modal open
+    if (e.code === 4001 || msg.toLowerCase().includes('user rejected')) {
+      return;
+    }
+    toast('MetaMask connection failed: ' + msg.substring(0, 100), 'error');
   }
+}
+
+function _onChainChanged(chainIdHex) {
+  // Rebuild Web3Provider with the new chainId so eth_call goes to the right network
+  if (!window.ethereum) return;
+  const chainId = parseInt(chainIdHex, 16);
+  provider = new ethers.providers.Web3Provider(window.ethereum, chainId);
+  signer = provider.getSigner();
+  if (CONTRACT_ADDRESS) {
+    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+  }
+  updateNetworkUI('', true, chainId);
+  toast('Network changed — provider updated', 'info');
 }
 
 // ── WalletConnect v2 — using SignClient (proper UMD, no bundle hacks) ──────────
@@ -1861,9 +1911,7 @@ function wcProgressHide() {
 }
 
 async function startWalletConnect() {
-  // Hide MetaMask card and divider, show WC section instead
-  document.getElementById('metamaskOption').style.display = 'none';
-  document.getElementById('walletDivider').style.display = 'none';
+  // Show WalletConnect QR flow.
   document.getElementById('wcConnectBtn').style.display = 'none';
   document.getElementById('wcQrSection').style.display = 'block';
   document.getElementById('wcStatus').style.display = 'block';
@@ -1946,8 +1994,6 @@ async function startWalletConnect() {
     loadStats();
 
   } catch (e) {
-    document.getElementById('metamaskOption').style.display = '';
-    document.getElementById('walletDivider').style.display = '';
     document.getElementById('wcConnectBtn').style.display = '';
     document.getElementById('wcStatus').style.display = 'none';
     wcProgressHide();
@@ -2157,7 +2203,12 @@ async function handleVerifyFile(input) {
 
 // ── CERTIFY ───────────────────────────────────────────────────────────────────
 async function certifyDocument() {
-  if (!walletAddress) { toast('Connect your wallet first', 'error'); return; }
+  if (!walletAddress || !signer) {
+    alert('No wallet connected. Please connect your wallet to continue.');
+    openWalletModal();
+    return;
+  }
+
   if (!CONTRACT_ADDRESS) { toast('Set contract address in Configuration', 'error'); navigate('config'); return; }
   if (!currentFileHash) { toast('Select a document first', 'error'); return; }
   if (!contract) {
@@ -2394,8 +2445,14 @@ function showVerifyResult(data) {
   document.getElementById('verifyResultTitle').textContent = data.revoked ? 'Document Revoked' : 'Document Verified';
   document.getElementById('verifyResultSub').textContent = data.revoked ? 'This document has been revoked by the certifier' : 'Document integrity confirmed on-chain';
 
+  const base = getEtherscanBase();
+  const contractLink = base
+    ? `<a href="${base}/address/${CONTRACT_ADDRESS}" target="_blank" style="color:var(--gold-400)">${shortAddr(CONTRACT_ADDRESS)}</a>`
+    : shortAddr(CONTRACT_ADDRESS);
+
   grid.innerHTML = `
     <div class="rc-field full"><div class="rf-label">Document Hash</div><div class="rf-value mono">${data.hash}</div></div>
+    <div class="rc-field"><div class="rf-label">Registry Contract</div><div class="rf-value mono">${contractLink}</div></div>
     <div class="rc-field"><div class="rf-label">Status</div><div class="rf-value"><span class="status-badge ${statusClass}">${statusIcon} ${status}</span></div></div>
     <div class="rc-field"><div class="rf-label">Certifier Address</div><div class="rf-value mono">${data.certifier}</div></div>
     <div class="rc-field"><div class="rf-label">Certification Date</div><div class="rf-value">${data.timestamp.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div></div>
@@ -2572,7 +2629,7 @@ function showDocModal(idx) {
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
       <button class="btn-secondary" onclick="copyToClipboard('${d.hash}')"><span>📋</span> Copy Hash</button>
-      ${base ? `<a href="${base}/search?q=${encodeURIComponent(d.hash)}" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px"><span>🔗</span> Etherscan</a>` : ''}
+      ${base ? `<a href="${base}/address/${CONTRACT_ADDRESS}" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px"><span>🔗</span> Registry Contract</a>` : ''}
       ${d.ipfsCID ? `<a href="https://ipfs.io/ipfs/${d.ipfsCID}" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px"><span>📦</span> IPFS</a>` : ''}
       ${canRevoke ? `<button class="btn-danger" onclick="revokeDocument('${d.hash}')"><span>🚫</span> Revoke Document</button>` : ''}
     </div>
@@ -2778,12 +2835,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pre-fetch ETH price so it's ready for the first certification
   fetchEthPrice();
 
-  // Auto-reconnect MetaMask if extension is present and was previously connected
-  if (typeof window.ethereum !== 'undefined') {
-    window.ethereum.request({method:'eth_accounts'}).then(accs => {
-      if (accs.length > 0) connectMetaMask();
-    }).catch(()=>{});
-  }
+  // Wallet connections are initiated by the user through WalletConnect only.
 });
 
 // close modal on overlay click
@@ -2797,17 +2849,6 @@ document.getElementById('docModal').addEventListener('click', function(e) {
     <button class="modal-close" onclick="closeWalletModal()">✕</button>
     <div class="wallet-picker-title">Connect Wallet</div>
     <div class="wallet-picker-sub">Choose how you want to connect</div>
-
-    <!-- MetaMask (browser extension) — hidden when WC flow is active -->
-    <button class="wallet-option" id="metamaskOption" onclick="connectMetaMask()">
-      <span class="wo-icon">🦊</span>
-      <div>
-        <div class="wo-name">MetaMask</div>
-        <div class="wo-desc" id="metamaskDesc">Browser extension</div>
-      </div>
-    </button>
-
-    <div class="wallet-divider" id="walletDivider">or scan with your mobile wallet</div>
 
     <!-- WalletConnect QR section — shown after wcConnectBtn is clicked -->
     <div id="wcQrSection" style="display:none">
