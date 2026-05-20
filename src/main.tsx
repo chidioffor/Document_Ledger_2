@@ -470,30 +470,40 @@ function RegistryPage({ wallet, toast }: any) {
       />
       <div className="table">
         {shown.map((d) => (
-          <div className="row" key={d.docHash}>
-            <div>
+          <div className="row registry-row" key={d.docHash}>
+            <div className="registry-row-header">
               <b>{d.title || 'Untitled'}</b>
               <p className="mono">{shortHash(d.docHash)}</p>
             </div>
-            <span>{shortAddr(d.certifier)}</span>
-            <Badge tone={d.revoked ? 'danger' : 'success'}>
-              {d.revoked ? 'Revoked' : 'Active'}
-            </Badge>
-            {wallet.address?.toLowerCase() === d.certifier.toLowerCase() && !d.revoked && (
-              <button
-                onClick={async () => {
-                  try {
-                    await revokeDocument(d.docHash);
-                    toast('Document revoked.', 'success');
-                    load();
-                  } catch (e: any) {
-                    toast(niceError(e), 'error');
-                  }
-                }}
-              >
-                Revoke
-              </button>
-            )}
+
+            <div className="registry-row-certifier">
+              {shortAddr(d.certifier)}
+            </div>
+
+            <div className="registry-row-status">
+              <Badge tone={d.revoked ? 'danger' : 'success'}>
+                {d.revoked ? 'Revoked' : 'Active'}
+              </Badge>
+            </div>
+
+            {wallet.address?.toLowerCase() === d.certifier.toLowerCase() &&
+              !d.revoked && (
+                <div className="registry-row-actions">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await revokeDocument(d.docHash);
+                        toast('Document revoked.', 'success');
+                        load();
+                      } catch (e: any) {
+                        toast(niceError(e), 'error');
+                      }
+                    }}
+                  >
+                    Revoke
+                  </button>
+                </div>
+              )}
           </div>
         ))}
       </div>

@@ -473,4 +473,51 @@ code {
   .card {
     padding: 18px;
   }
+  /* Registry rows - prevent overflow on mobile */
+  .registry-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .registry-row-header,
+  .registry-row-certifier,
+  .registry-row-status,
+  .registry-row-actions {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .registry-row-header b {
+    display: block;
+    word-break: break-word;
+  }
+
+  .registry-row-header .mono {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+
+  .registry-row-certifier {
+    font-size: 1.05rem;
+  }
+
+  .registry-row-status {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .registry-row-status .badge {
+    width: auto;
+    max-width: 100%;
+    display: inline-flex;
+  }
+
+  .registry-row-actions button {
+    width: auto;
+    max-width: 100%;
+  }
 }
