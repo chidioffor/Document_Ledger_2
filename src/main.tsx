@@ -437,6 +437,7 @@ function RegistryPage({ wallet, toast }: any) {
   const [docs, setDocs] = useState<DocRecord[]>([]);
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState('');
+  const [revokingHash, setRevokingHash] = useState<string | null>(null);
 
   async function load() {
     setBusy(true);
@@ -468,6 +469,23 @@ function RegistryPage({ wallet, toast }: any) {
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
+      {revokingHash && (
+        <div className="progress-alert">
+          <div className="progress-alert-header">
+            <strong>Preparing revoke transaction</strong>
+            <span>Please confirm in your wallet</span>
+          </div>
+
+          <p>
+            Do not refresh the page. The revoke transaction is still in progress and
+            will complete after blockchain confirmation.
+          </p>
+
+          <div className="progress-bar">
+            <div className="progress-bar-fill" />
+          </div>
+        </div>
+      )}
       <div className="table">
         {shown.map((d) => (
           <div className="row registry-row" key={d.docHash}>
@@ -490,25 +508,23 @@ function RegistryPage({ wallet, toast }: any) {
               !d.revoked && (
                 <div className="registry-row-actions">
                   <button
+                    disabled={revokingHash === d.docHash}
                     onClick={async () => {
                       try {
-                        // Show persistent informational toast
-                        toast(
-                          'Please confirm in your conected Wallet. Preparing to revoke transaction. Do not refresh this page.',
-                          'info'
-                        );
-                        // Send revoke transaction
+                        setRevokingHash(d.docHash);
+
                         await revokeDocument(d.docHash);
-                        // Success message (automatically replaces the earlier info toast after timeout)
+
                         toast('Document revoked successfully.', 'success');
-                        // Refresh registry
-                        load();
+                        await load();
                       } catch (e: any) {
                         toast(niceError(e), 'error');
+                      } finally {
+                        setRevokingHash(null);
                       }
                     }}
                   >
-                    Revoke
+                    {revokingHash === d.docHash ? 'Revoking…' : 'Revoke'}
                   </button>
                 </div>
               )}
