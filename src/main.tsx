@@ -492,8 +492,16 @@ function RegistryPage({ wallet, toast }: any) {
                   <button
                     onClick={async () => {
                       try {
+                        // Show persistent informational toast
+                        toast(
+                          'Please confirm in your conected Wallet. Preparing to revoke transaction. Do not refresh this page.',
+                          'info'
+                        );
+                        // Send revoke transaction
                         await revokeDocument(d.docHash);
-                        toast('Document revoked.', 'success');
+                        // Success message (automatically replaces the earlier info toast after timeout)
+                        toast('Document revoked successfully.', 'success');
+                        // Refresh registry
                         load();
                       } catch (e: any) {
                         toast(niceError(e), 'error');
