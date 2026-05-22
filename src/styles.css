@@ -584,9 +584,16 @@ code {
     text-align: center;
   }
 
+  .footer-brand {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
   .footer-brand h2 {
     margin: 0;
-    font-size: 3rem;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    line-height: 1.1;
     font-family: 'Playfair Display', serif;
     color: #ffffff;
   }
@@ -598,16 +605,17 @@ code {
   }
 
   .footer-brand p {
-    margin: 12px 0;
-    color: rgba(255,255,255,0.65);
-    font-size: 1.05rem;
+    margin: 10px 0;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
   .footer-regions {
-    margin-top: 36px;
-    letter-spacing: 6px;
-    color: rgba(255,255,255,0.25);
-    font-size: 1rem;
+    margin-top: 28px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.22);
+    font-size: 0.9rem;
   }
 
   .footer-links {
