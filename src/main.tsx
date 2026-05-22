@@ -22,8 +22,17 @@ import {
 } from './ethereum';
 import { CONTRACT_ADDRESS, DEFAULT_NETWORK, NETWORKS } from './constants';
 import { createTokenizationPDF, createVerificationPDF } from './pdfCertificate';
+import TermsPage from './TermsPage';
 
-type Page = 'dashboard' | 'wallet' | 'tokenize' | 'verify' | 'registry' | 'settings';
+type Page =
+  | 'dashboard'
+  | 'wallet'
+  | 'tokenize'
+  | 'verify'
+  | 'registry'
+  | 'settings'
+  | 'terms'
+  | 'contact';
 
 const pageLabels: Record<Page, string> = {
   dashboard: 'Dashboard',
@@ -32,6 +41,8 @@ const pageLabels: Record<Page, string> = {
   verify: 'Verify Document',
   registry: 'Registry',
   settings: 'Configuration',
+  terms: 'Terms & Conditions',
+  contact: 'Contact Us',
 };
 
 function Toast({ msg, type = 'info' }: { msg: string; type?: string }) {
@@ -549,6 +560,69 @@ function Settings() {
   );
 }
 
+// function TermsPage() is supposwed to be here, but its now called imported from 
+// src/TermsPage.tsx
+
+
+function ContactPage() {
+  return (
+    <Card>
+      <h2>Contact Us</h2>
+
+      <div className="contact-grid">
+        <a
+          className="contact-card"
+          href="mailto:info@sayariglobalholding.site"
+        >
+          <h3>Email Support</h3>
+          <p>info@sayariglobalholding.site</p>
+        </a>
+
+        <a
+          className="contact-card"
+          href="https://wa.me/447000000000"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <h3>WhatsApp</h3>
+          <p>Message us directly on WhatsApp</p>
+        </a>
+
+        <a
+          className="contact-card"
+          href="https://t.me/sayariglobalholding"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <h3>Telegram</h3>
+          <p>@sayariglobalholding</p>
+        </a>
+      </div>
+
+      <form
+        className="contact-form"
+        action="mailto:info@sayariglobalholding.site"
+        method="post"
+        encType="text/plain"
+      >
+        <input type="text" placeholder="Your Name" required />
+
+        <input type="email" placeholder="Your Email" required />
+
+        <textarea
+          placeholder="Your Message"
+          rows={6}
+          required
+        />
+
+        <button type="submit" className="primary">
+          Send Message
+        </button>
+      </form>
+    </Card>
+  );
+}
+
 function App() {
   const [page, setPage] = useState<Page>('dashboard');
   const wallet = useWallet();
@@ -592,6 +666,10 @@ function App() {
         <VerifyPage toast={toast} />
       ) : page === 'registry' ? (
         <RegistryPage wallet={wallet} toast={toast} />
+      ) : page === 'terms' ? (
+        <TermsPage />
+      ) : page === 'contact' ? (
+        <ContactPage />
       ) : (
         <Settings />
       ),
@@ -625,6 +703,37 @@ function App() {
           </Badge>
         </header>
         {current}
+
+        <footer className="footer">
+          <div className="footer-brand">
+            <h2>
+              SAYARI <span>Global Holdings</span>
+            </h2>
+
+            <p>Planet Sayari LLC</p>
+
+            <p>A Delaware registered holding company</p>
+
+            <div className="footer-regions">
+              USA | UK | KENYA | ROMANIA
+            </div>
+          </div>
+
+          <div className="footer-links">
+          <button onClick={() => goToPage('terms')}>
+            Terms & Conditions
+          </button>
+
+          <button onClick={() => goToPage('contact')}>
+            Contact Us
+          </button>
+          </div>
+
+          <div className="footer-copy">
+            © {new Date().getFullYear()} Sayari Global Holdings.
+            All rights reserved.
+          </div>
+        </footer>
       </main>
       <div className="toasts">
         {toasts.map((t) => (

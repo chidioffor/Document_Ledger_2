@@ -576,4 +576,135 @@ code {
       transform: translateX(260%);
     }
   }
+
+  .footer {
+    margin-top: 60px;
+    padding: 60px 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+  }
+
+  .footer-brand h2 {
+    margin: 0;
+    font-size: 3rem;
+    font-family: 'Playfair Display', serif;
+    color: #ffffff;
+  }
+
+  .footer-brand h2 span {
+    color: #c9a24a;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .footer-brand p {
+    margin: 12px 0;
+    color: rgba(255,255,255,0.65);
+    font-size: 1.05rem;
+  }
+
+  .footer-regions {
+    margin-top: 36px;
+    letter-spacing: 6px;
+    color: rgba(255,255,255,0.25);
+    font-size: 1rem;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links button {
+    background: rgba(201,162,74,0.08);
+    border: 1px solid rgba(201,162,74,0.35);
+    color: #e5c97a;
+    padding: 12px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.25s ease;
+  }
+
+  .footer-links button:hover {
+    background: rgba(201,162,74,0.18);
+    transform: translateY(-1px);
+  }
+
+  .footer-copy {
+    margin-top: 28px;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.95rem;
+  }
+
+  .terms-content {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.82);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .contact-card {
+    display: block;
+    padding: 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    transition: 0.25s ease;
+  }
+
+  .contact-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(201,162,74,0.35);
+  }
+
+  .contact-card h3 {
+    margin-bottom: 8px;
+    color: #e5c97a;
+  }
+
+  .contact-card p {
+    color: rgba(255,255,255,0.72);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .contact-form textarea {
+    resize: vertical;
+  }
+
+  .terms-content h3 {
+    margin-top: 24px;
+    margin-bottom: 4px;
+    color: #e5c97a;
+    font-size: 1.15rem;
+  }
+
+  .terms-content p {
+    margin: 0;
+    color: rgba(255,255,255,0.82);
+  }
+
+  .terms-content b {
+    color: #ffffff;
+  }
+
+  .terms-content {
+    max-width: 980px;
+  }
 }
