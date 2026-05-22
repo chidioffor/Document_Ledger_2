@@ -605,17 +605,35 @@ function ContactPage() {
         method="post"
         encType="text/plain"
       >
-        <input type="text" placeholder="Your Name" required />
+        <h3 className="contact-form-title">
+          Send us a message
+        </h3>
 
-        <input type="email" placeholder="Your Email" required />
-
-        <textarea
-          placeholder="Your Message"
-          rows={6}
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
           required
         />
 
-        <button type="submit" className="primary">
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email"
+          required
+        />
+
+        <textarea
+          name="message"
+          placeholder="Your Message"
+          rows={8}
+          required
+        />
+
+        <button
+          type="submit"
+          className="primary"
+        >
           Send Message
         </button>
       </form>
