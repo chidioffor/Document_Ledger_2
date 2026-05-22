@@ -963,134 +963,194 @@ code {
     width: 100%;
     margin-top: 0;
   }
+}
 
-  /* Final footer/contact override */
+/* Final footer/contact override */
+.footer {
+  width: 100%;
+  max-width: 980px;
+  margin: 72px auto 0;
+  padding: 56px 20px 38px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-brand {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-brand h2 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.footer-brand h2 span {
+  color: #c9a24a;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.footer-brand p {
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.footer-regions {
+  margin-top: 32px;
+  font-size: 0.95rem;
+  letter-spacing: 5px;
+  color: #e5c97a;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+
+.footer-links button {
+  width: auto;
+  min-width: 150px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 162, 74, 0.65);
+  background: transparent;
+  color: #e5c97a;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.footer-copy {
+  max-width: 980px;
+  margin: 36px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.95rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 28px;
+  width: 100%;
+}
+
+.contact-form-title {
+  margin: 0 0 6px;
+  color: #e5c97a;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-form textarea {
+  min-height: 220px;
+  resize: vertical;
+}
+
+.contact-form button {
+  width: 100%;
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
   .footer {
-    width: 100%;
-    max-width: 980px;
-    margin: 72px auto 0;
-    padding: 56px 20px 38px;
-    text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .footer-brand {
-    max-width: 620px;
-    margin: 0 auto;
-    text-align: center;
+    max-width: 100%;
+    margin-top: 48px;
+    padding: 42px 16px 30px;
   }
 
   .footer-brand h2 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1.1;
-    color: #ffffff;
-  }
-
-  .footer-brand h2 span {
-    color: #c9a24a;
-    font-style: italic;
-    font-weight: 500;
-  }
-
-  .footer-brand p {
-    margin: 14px 0 0;
-    font-size: 1rem;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.68);
+    font-size: 2rem;
   }
 
   .footer-regions {
-    margin-top: 32px;
-    font-size: 0.95rem;
-    letter-spacing: 5px;
-    color: #e5c97a;
-  }
-
-  .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    margin-top: 36px;
-    flex-wrap: wrap;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    line-height: 1.8;
   }
 
   .footer-links button {
-    width: auto;
-    min-width: 150px;
-    padding: 12px 22px;
-    border-radius: 14px;
-    border: 1px solid rgba(201, 162, 74, 0.65);
-    background: transparent;
-    color: #e5c97a;
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
-  .footer-copy {
-    max-width: 980px;
-    margin: 36px auto 0;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.65);
-    font-size: 0.95rem;
-  }
-
-  .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-top: 28px;
     width: 100%;
-  }
-
-  .contact-form-title {
-    margin: 0 0 6px;
-    color: #e5c97a;
-    font-size: 1.45rem;
-    font-weight: 800;
-  }
-
-  .contact-form input,
-  .contact-form textarea {
-    width: 100%;
-    box-sizing: border-box;
   }
 
   .contact-form textarea {
-    min-height: 220px;
-    resize: vertical;
+    min-height: 240px;
   }
+}
 
-  .contact-form button {
-    width: 100%;
-    margin-top: 0;
-  }
+/* Contact card final polish */
+.contact-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  margin: 24px 0 34px;
+}
 
-  @media (max-width: 700px) {
-    .footer {
-      max-width: 100%;
-      margin-top: 48px;
-      padding: 42px 16px 30px;
-    }
+.contact-card {
+  display: block;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  text-decoration: none;
+  box-shadow: none;
+}
 
-    .footer-brand h2 {
-      font-size: 2rem;
-    }
+.contact-card:hover {
+  transform: none;
+  border: 0;
+}
 
-    .footer-regions {
-      font-size: 0.78rem;
-      letter-spacing: 3px;
-      line-height: 1.8;
-    }
+.contact-card h3 {
+  margin: 0 0 12px;
+  color: #c9a24a;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: var(--font-ui);
+}
 
-    .footer-links button {
-      width: 100%;
-    }
+.contact-card p {
+  margin: 0;
+  color: #f6f3ea;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-decoration: none;
+}
 
-    .contact-form textarea {
-      min-height: 240px;
-    }
-  }
+.contact-card,
+.contact-card:visited,
+.contact-card:hover,
+.contact-card:active {
+  color: #f6f3ea;
+}
+
+.contact-card p,
+.contact-card p:visited {
+  color: #f6f3ea;
+}
+
+/* Remove default blue link appearance inside contact cards */
+.contact-card * {
+  text-decoration: none;
+}
+
+/* Slightly reduce Contact Us heading dominance */
+.card > h2:first-child {
+  margin-bottom: 26px;
 }
