@@ -580,7 +580,7 @@ function ContactPage() {
 
         <a
           className="contact-card"
-          href="https://wa.me/447000000000"
+          href="https://wa.me/40773925258"
           target="_blank"
           rel="noreferrer"
         >
