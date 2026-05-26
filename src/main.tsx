@@ -590,12 +590,12 @@ function ContactPage() {
 
         <a
           className="contact-card"
-          href="https://t.me/sayariglobalholding"
+          href="https://t.me/sayariglobalholdig"
           target="_blank"
           rel="noreferrer"
         >
           <h3>Telegram</h3>
-          <p>@sayariglobalholding</p>
+          <p>@sayariglobalholdig</p>
         </a>
       </div>
 
